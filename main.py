@@ -13,6 +13,11 @@ LISTING_PATH = "gestioneaziendeconautocandidature.htm"
 BASE__URL = "https://tirocini.unibo.it/tirocini/studenti/"
 
 
+class SessionExpiredError(Exception):
+    def __init__(self, msg="JSESSIONID is expired, please update .env"):
+        super().__init__(msg)
+
+
 def setup_payload():
     return {"data":
             {
@@ -30,21 +35,50 @@ def setup_payload():
 
 def setup_cookies():
     load_dotenv()
-    return {"JSESSIONID": os.getenv('JSESSIONID')}
+    token = os.getenv('JSESSIONID')
+    if not token:
+        print("[ERROR] JSESSIONID is missing in .env")
+    return {"JSESSIONID": token}
 
 
 def fetch_listing_page(url, cookies, payload, page_num=1):
-    return requests.post(url+"?page="+str(page_num), cookies=cookies, data=payload)
+    try:
+        res = requests.post(url+"?page="+str(page_num),
+                            cookies=cookies, data=payload)
+        res.raise_for_status()
+    except:
+        print(
+            f"[WARNING] Error during fetching of {url}, status code: {res.status_code}")
+        return None
+    return check_session(res)
+
+
+def check_session(res):
+    if "La tua sessione" in res.text and "scaduta" in res.text:
+        raise SessionExpiredError(
+            "JSESSIONID is expired, please update .env"
+        )
+    return res
 
 
 def fetch_company_page(url, cookies):
-    return requests.get(url=url, cookies=cookies)
+    try:
+        res = requests.get(url=url, cookies=cookies)
+        res.raise_for_status()
+    except:
+        print(
+            f"[WARNING] Error during fetching of {url}, status code: {res.status_code}")
+        return None
+    return res
 
 
 def extract_companies(page, base_url):
     rows = []
     soup = BeautifulSoup(page, "html.parser")
     table = soup.find('table', class_="iceDataTblOutline")
+    if table is None:
+        print(f"  [WARN] nessuna tabella 'iceDataTblOutline'")
+        return None
     rows += table.find_all('tr', class_="rigaPari")
     rows += table.find_all('tr', class_="rigaDispari")
     return [{"name": row.td.a.p.get_text(strip=True), "url": base_url+row.td.a["href"]} for row in rows]
@@ -58,7 +92,7 @@ def extract_company_info(page, url):
     }
     if table is None:
         print(f"  [WARN] nessuna tabella 'tbSimpleData' in {url}")
-        return list
+        return None
     for row in table.find_all("tr"):
         name = row.find("td", class_="formLabelNew")
         value = row.find("td", class_="value")
@@ -72,8 +106,7 @@ def fetch_all_listing_pages(url, cookies, payload, max_pages=7, max_workers=3):
     with ThreadPoolExecutor(max_workers=max_workers) as ex:
         results = list(ex.map(fetch_listing_page, itertools.repeat(
             url), itertools.repeat(cookies), itertools.repeat(payload), range(1, max_pages+1)))
-
-    return results
+    return list(filter(lambda x: x, results))
 
 
 def write_csv(file):
@@ -125,4 +158,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except SessionExpiredError as e:
+        sys.exit(f"[ERROR] {e}")
