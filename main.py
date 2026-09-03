@@ -45,10 +45,12 @@ def extract_companies(page, base_url):
     return [{"name": row.td.a.p.get_text(strip=True), "url": base_url+row.td.a["href"]} for row in rows]
 
 
-def extract_company_info(page):
+def extract_company_info(page, url):
     soup = BeautifulSoup(page, "html.parser")
     table = soup.find("table", class_="tbSimpleData")
-    list = {}
+    list = {
+        "Indirizzo dell'offerta": url
+    }
     for row in table.find_all("tr"):
         name = row.find("td", class_="formLabelNew")
         value = row.find("td", class_="value")
@@ -63,12 +65,12 @@ def main():
     page = fetch_listing_page(
         url=BASE__URL+LISTING_PATH, cookies=cookies, payload=payload)
     companies = extract_companies(page.content, BASE__URL)
+    companies_info = []
     for item in companies:
-        company_page = fetch_company_page(
-            item["url"], cookies=cookies)
-        item["info"] = extract_company_info(company_page.content)
+        company_page = fetch_company_page(item["url"], cookies=cookies)
+        companies_info += [extract_company_info(company_page.content, item["url"])]
     with open("log.json", "w") as f:
-        json.dump(companies, f, ensure_ascii=False, indent=2)
+        json.dump(companies_info, f, ensure_ascii=False, indent=2)
 
 
 if __name__ == "__main__":
