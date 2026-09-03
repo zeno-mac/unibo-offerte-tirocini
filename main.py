@@ -35,17 +35,17 @@ def send_get_req(url, cookies):
     return requests.get(url=url, cookies=cookies)
 
 
-def parse_links(page):
+def parse_links(page, base_url):
     rows = []
-    soup = BeautifulSoup(page.content, "html.parser")
+    soup = BeautifulSoup(page, "html.parser")
     table = soup.find('table', class_="iceDataTblOutline")
     rows += table.find_all('tr', class_="rigaPari")
     rows += table.find_all('tr', class_="rigaDispari")
-    return [BASE__URL+row.td.a["href"] for row in rows]
+    return [base_url+row.td.a["href"] for row in rows]
 
 
 def parse_company_page(page):
-    soup = BeautifulSoup(page.content, "html.parser")
+    soup = BeautifulSoup(page, "html.parser")
     return soup.find("table", class_="tbSimpleData")
 
 
@@ -54,9 +54,9 @@ def main():
     cookies = setup_cookies()
     p = send_post_req(BASE__URL+LISTING_PATH, cookies=cookies,
                       payload=payload, page_num=1)
-    links = parse_links(p)
+    links = parse_links(p.content, BASE__URL)
     page = send_get_req(links[0], cookies=cookies)
-    print(parse_company_page(page))
+    print(parse_company_page(page.content))
 
 
 if __name__ == "__main__":
