@@ -2,6 +2,8 @@ import requests
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 import os
+import json
+
 
 LISTING_PATH = "gestioneaziendeconautocandidature.htm"
 BASE__URL = "https://tirocini.unibo.it/tirocini/studenti/"
@@ -46,7 +48,14 @@ def parse_links(page, base_url):
 
 def parse_company_page(page):
     soup = BeautifulSoup(page, "html.parser")
-    return soup.find("table", class_="tbSimpleData")
+    table = soup.find("table", class_="tbSimpleData")
+    list = {}
+    for row in table.find_all("tr"):
+        name = row.find("td", class_="formLabelNew")
+        value = row.find("td", class_="value")
+        if name and value:
+            list[name.string] = value.string
+    return list
 
 
 def main():
@@ -55,8 +64,13 @@ def main():
     p = send_post_req(BASE__URL+LISTING_PATH, cookies=cookies,
                       payload=payload, page_num=1)
     links = parse_links(p.content, BASE__URL)
-    page = send_get_req(links[0], cookies=cookies)
-    print(parse_company_page(page.content))
+    list = []
+    for link in links:
+        page = send_get_req(url=link, cookies=cookies)
+        list.append(parse_company_page(page.content))
+
+    with open("log.json", "w") as f:
+        json.dump(list, f, ensure_ascii=False, indent=2)
 
 
 if __name__ == "__main__":
