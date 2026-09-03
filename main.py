@@ -3,11 +3,10 @@ from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 import os
 import csv
-from concurrent.futures import ThreadPoolExecutor
-import itertools
 import json
 import sys
 from typing import Optional
+from counter import startCounter
 
 
 LISTING_PATH = "gestioneaziendeconautocandidature.htm"
@@ -34,7 +33,7 @@ def setup_payload() -> dict:
             },
             }
 
-
+        
 def setup_cookies() -> dict:
     """Input: None (load JSESSIONID from .env). Output: dict {'JSESSIONID': str | None}."""
     load_dotenv()
@@ -101,7 +100,7 @@ def extract_company_info(page: bytes, url: str) -> Optional[dict]:
     or None if table is not present."""
     soup = BeautifulSoup(page, "html.parser")
     table = soup.find("table", class_="tbSimpleData")
-    list = {
+    dict = {
         "Indirizzo dell'offerta": url
     }
     if table is None:
@@ -111,18 +110,23 @@ def extract_company_info(page: bytes, url: str) -> Optional[dict]:
         name = row.find("td", class_="formLabelNew")
         value = row.find("td", class_="value")
         if name and value:
-            list[name.get_text(strip=True)] = value.get_text(
+            dict[name.get_text(strip=True)] = value.get_text(
                 separator=" ", strip=True)
-    return list
+    return dict
 
 
-def fetch_all_listing_pages(url: str, cookies: dict, payload: dict, max_pages: int = 7, max_workers: int = 3) -> list[requests.Response]:
+def fetch_all_listing_pages(url: str, cookies: dict, payload: dict, max_pages: int = 7) -> list[requests.Response]:
     """Input: url (str), cookies (dict), payload (dict), max_pages (int), max_workers (int).
     Output: lista di requests.Response (only if pages are correctly fetched)."""
-    with ThreadPoolExecutor(max_workers=max_workers) as ex:
-        results = list(ex.map(fetch_listing_page, itertools.repeat(
-            url), itertools.repeat(cookies), itertools.repeat(payload), range(1, max_pages+1)))
-    return list(filter(lambda x: x, results))
+    pages = []
+    counter = startCounter("Listing pages loaded", 1, max_pages)
+    for i in range(1, max_pages+1):
+        counter()
+        page = fetch_listing_page(url, cookies, payload, i)
+        if page:
+            pages.append(page)
+    return pages
+    
 
 
 def write_csv(file: list[dict]) -> None:
@@ -140,9 +144,9 @@ def write_json(file: list[dict]) -> None:
         json.dump(file, f, ensure_ascii=False, indent=2)
 
 
-def format_number(number: int) -> str:
-    """Input: number (int). Output: 3 characters str with leading 0s (es. 7 -> '007')."""
-    return "0"*(3 - len(str(number))) + str(number)
+def format_number(number: int, digits: int) -> str:
+    """Input: number (int), digits (int). Output: 3 characters str with leading 0s (es. 7 -> '007')."""
+    return "0"*(digits - len(str(number))) + str(number)
 
 
 def main() -> None:
@@ -151,7 +155,7 @@ def main() -> None:
     cookies = setup_cookies()
     print("Fetching listing pages...")
     pages = fetch_all_listing_pages(url=BASE__URL+LISTING_PATH,
-                                    cookies=cookies, payload=payload)
+                                    cookies=cookies, payload=payload, max_pages=7)
     companies = []
     print("Extracting companies urls...")
     for page in pages:
@@ -159,16 +163,9 @@ def main() -> None:
 
     companies_info = []
     print("Fetching and extracting companies pages...")
-    counter = 1
+    counter = startCounter("Offer pages loaded", 1, len(companies))
     for company in companies:
-        if (counter == 1):
-            sys.stdout.write(
-                f"Azienda {format_number(counter)}/{len(companies)}")
-        else:
-            sys.stdout.write("\b"*7)
-            sys.stdout.write(f"{format_number(counter)}/{len(companies)}")
-        sys.stdout.flush()
-        counter += 1
+        counter()
         page = fetch_company_page(url=company["url"], cookies=cookies)
         companies_info.append(extract_company_info(
             page.content, company["url"]))
