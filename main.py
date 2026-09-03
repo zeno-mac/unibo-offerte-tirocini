@@ -5,6 +5,7 @@ import os
 import csv
 from concurrent.futures import ThreadPoolExecutor
 import itertools
+import json
 
 
 LISTING_PATH = "gestioneaziendeconautocandidature.htm"
@@ -104,6 +105,8 @@ def main():
         writer = csv.DictWriter(f, fieldnames=fieldnames, restval="")
         writer.writeheader()
         writer.writerows(companies_info)
+    with open("log.json", "w") as f:
+        json.dump(companies_info, f, ensure_ascii=False, indent=2)
 
 
 if __name__ == "__main__":
