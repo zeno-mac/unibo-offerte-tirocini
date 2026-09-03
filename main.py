@@ -6,6 +6,7 @@ import csv
 from concurrent.futures import ThreadPoolExecutor
 import itertools
 import json
+import sys
 
 
 LISTING_PATH = "gestioneaziendeconautocandidature.htm"
@@ -67,18 +68,27 @@ def extract_company_info(page, url):
     return list
 
 
-def fetch_all_listing_pages(url, cookies, payload, max_pages=7, max_workers=10):
+def fetch_all_listing_pages(url, cookies, payload, max_pages=7, max_workers=3):
     with ThreadPoolExecutor(max_workers=max_workers) as ex:
         results = list(ex.map(fetch_listing_page, itertools.repeat(
             url), itertools.repeat(cookies), itertools.repeat(payload), range(1, max_pages+1)))
 
     return results
 
-def fetch_all_company_pages(urls, cookies, max_workers=5):
-    with ThreadPoolExecutor(max_workers=max_workers) as ex:
-        results = list(ex.map(fetch_company_page, urls, itertools.repeat(cookies)))
-    return results
+def write_csv(file):
+    fieldnames = list(dict.fromkeys(key for info in file for key in info))
+    with open("log.csv", "w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=fieldnames, restval="")
+        writer.writeheader()
+        writer.writerows(file)
+       
+def write_json(file):
+    with open("log.json", "w") as f:
+        json.dump(file, f, ensure_ascii=False, indent=2) 
+        
 
+def format_number(number):
+    return "0"*(3 - len(str(number))) + str(number)
 def main():
     payload = setup_payload()
     cookies = setup_cookies()
@@ -89,24 +99,24 @@ def main():
     print("Extracting companies urls...")
     for page in pages:
         companies += extract_companies(page.content, BASE__URL)
-    urls = [c["url"] for c in companies]
 
-    print("Fetching companies pages...")
-    company_pages = fetch_all_company_pages(urls, cookies)
+    companies_info = []
+    print("Fetching and extracting companies pages...")
+    counter = 1
+    for company in companies:
+        if(counter == 1):
+            sys.stdout.write(f"Azienda {format_number(counter)}/{len(companies)}")
+        else:
+            sys.stdout.write("\b"*7)
+            sys.stdout.write(f"{format_number(counter)}/{len(companies)}")
+        sys.stdout.flush()
+        counter+=1
+        page = fetch_company_page(url=company["url"], cookies=cookies)
+        companies_info.append(extract_company_info(page.content, company["url"]))
+        
+    write_csv(companies_info)
+    write_json(companies_info)
 
-    print("Extracting companies info...")
-    companies_info = [
-        extract_company_info(page.content, url)
-        for url, page in zip(urls, company_pages)
-    ]
-    fieldnames = list(dict.fromkeys(
-        key for info in companies_info for key in info))
-    with open("log.csv", "w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=fieldnames, restval="")
-        writer.writeheader()
-        writer.writerows(companies_info)
-    with open("log.json", "w") as f:
-        json.dump(companies_info, f, ensure_ascii=False, indent=2)
 
 
 if __name__ == "__main__":
