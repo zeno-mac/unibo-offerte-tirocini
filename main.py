@@ -3,6 +3,9 @@ from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 import os
 import csv
+from concurrent.futures import ThreadPoolExecutor
+import itertools
+
 
 LISTING_PATH = "gestioneaziendeconautocandidature.htm"
 BASE__URL = "https://tirocini.unibo.it/tirocini/studenti/"
@@ -51,24 +54,50 @@ def extract_company_info(page, url):
     list = {
         "Indirizzo dell'offerta": url
     }
+    if table is None:
+        print(f"  [WARN] nessuna tabella 'tbSimpleData' in {url}")
+        return list
     for row in table.find_all("tr"):
         name = row.find("td", class_="formLabelNew")
         value = row.find("td", class_="value")
         if name and value:
-            list[name.string] = value.string
+            list[name.get_text(strip=True)] = value.get_text(
+                separator=" ", strip=True)
     return list
 
+
+def fetch_all_listing_pages(url, cookies, payload, max_pages=7, max_workers=10):
+    with ThreadPoolExecutor(max_workers=max_workers) as ex:
+        results = list(ex.map(fetch_listing_page, itertools.repeat(
+            url), itertools.repeat(cookies), itertools.repeat(payload), range(1, max_pages+1)))
+
+    return results
+
+def fetch_all_company_pages(urls, cookies, max_workers=5):
+    with ThreadPoolExecutor(max_workers=max_workers) as ex:
+        results = list(ex.map(fetch_company_page, urls, itertools.repeat(cookies)))
+    return results
 
 def main():
     payload = setup_payload()
     cookies = setup_cookies()
-    page = fetch_listing_page(
-        url=BASE__URL+LISTING_PATH, cookies=cookies, payload=payload)
-    companies = extract_companies(page.content, BASE__URL)
-    companies_info = []
-    for item in companies:
-        company_page = fetch_company_page(item["url"], cookies=cookies)
-        companies_info += [extract_company_info(company_page.content, item["url"])]
+    print("Fetching listing pages...")
+    pages = fetch_all_listing_pages(url=BASE__URL+LISTING_PATH,
+                     cookies=cookies, payload=payload)
+    companies = []
+    print("Extracting companies urls...")
+    for page in pages:
+        companies += extract_companies(page.content, BASE__URL)
+    urls = [c["url"] for c in companies]
+
+    print("Fetching companies pages...")
+    company_pages = fetch_all_company_pages(urls, cookies)
+
+    print("Extracting companies info...")
+    companies_info = [
+        extract_company_info(page.content, url)
+        for url, page in zip(urls, company_pages)
+    ]
     fieldnames = list(dict.fromkeys(
         key for info in companies_info for key in info))
     with open("log.csv", "w", newline="", encoding="utf-8") as f:
