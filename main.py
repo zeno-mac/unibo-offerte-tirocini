@@ -2,7 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 import os
-import json
+import csv
 
 LISTING_PATH = "gestioneaziendeconautocandidature.htm"
 BASE__URL = "https://tirocini.unibo.it/tirocini/studenti/"
@@ -69,8 +69,12 @@ def main():
     for item in companies:
         company_page = fetch_company_page(item["url"], cookies=cookies)
         companies_info += [extract_company_info(company_page.content, item["url"])]
-    with open("log.json", "w") as f:
-        json.dump(companies_info, f, ensure_ascii=False, indent=2)
+    fieldnames = list(dict.fromkeys(
+        key for info in companies_info for key in info))
+    with open("log.csv", "w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=fieldnames, restval="")
+        writer.writeheader()
+        writer.writerows(companies_info)
 
 
 if __name__ == "__main__":
