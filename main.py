@@ -7,6 +7,7 @@ from concurrent.futures import ThreadPoolExecutor
 import itertools
 import json
 import sys
+from typing import Optional
 
 
 LISTING_PATH = "gestioneaziendeconautocandidature.htm"
@@ -18,7 +19,8 @@ class SessionExpiredError(Exception):
         super().__init__(msg)
 
 
-def setup_payload():
+def setup_payload() -> dict:
+    """Input: None. Output: dict with form data (key : 'data')."""
     return {"data":
             {
                 "denominazioneAzienda": "",
@@ -33,7 +35,8 @@ def setup_payload():
             }
 
 
-def setup_cookies():
+def setup_cookies() -> dict:
+    """Input: None (load JSESSIONID from .env). Output: dict {'JSESSIONID': str | None}."""
     load_dotenv()
     token = os.getenv('JSESSIONID')
     if not token:
@@ -41,7 +44,9 @@ def setup_cookies():
     return {"JSESSIONID": token}
 
 
-def fetch_listing_page(url, cookies, payload, page_num=1):
+def fetch_listing_page(url: str, cookies: dict, payload: dict, page_num: int = 1) -> Optional[requests.Response]:
+    """Input: url (str), cookies (dict), payload (dict), page_num (int).
+    Output: requests.Response of listing page or None in case of HTTP errors."""
     try:
         res = requests.post(url+"?page="+str(page_num),
                             cookies=cookies, data=payload)
@@ -53,7 +58,9 @@ def fetch_listing_page(url, cookies, payload, page_num=1):
     return check_session(res)
 
 
-def check_session(res):
+def check_session(res: requests.Response) -> requests.Response:
+    """Input: res (requests.Response). Output: same response if session is valid;
+    raise SessionExpiredError if JSESSIONID is expired."""
     if "La tua sessione" in res.text and "scaduta" in res.text:
         raise SessionExpiredError(
             "JSESSIONID is expired, please update .env"
@@ -61,7 +68,9 @@ def check_session(res):
     return res
 
 
-def fetch_company_page(url, cookies):
+def fetch_company_page(url: str, cookies: dict) -> Optional[requests.Response]:
+    """Input: url (str) of the company page, cookies (dict).
+    Output: requests.Response or None in case of HTTP errors."""
     try:
         res = requests.get(url=url, cookies=cookies)
         res.raise_for_status()
@@ -72,7 +81,9 @@ def fetch_company_page(url, cookies):
     return res
 
 
-def extract_companies(page, base_url):
+def extract_companies(page: bytes, base_url: str) -> Optional[list[dict]]:
+    """Input: page (bytes/str, HTML della pagina di elenco), base_url (str).
+    Output: list of dict {'name': str, 'url': str}, or None if table is not present."""
     rows = []
     soup = BeautifulSoup(page, "html.parser")
     table = soup.find('table', class_="iceDataTblOutline")
@@ -84,7 +95,10 @@ def extract_companies(page, base_url):
     return [{"name": row.td.a.p.get_text(strip=True), "url": base_url+row.td.a["href"]} for row in rows]
 
 
-def extract_company_info(page, url):
+def extract_company_info(page: bytes, url: str) -> Optional[dict]:
+    """Input: page (bytes/str, HTML of the company page), url (str).
+    Output: dict {field: value} with "Offer url",
+    or None if table is not present."""
     soup = BeautifulSoup(page, "html.parser")
     table = soup.find("table", class_="tbSimpleData")
     list = {
@@ -102,14 +116,17 @@ def extract_company_info(page, url):
     return list
 
 
-def fetch_all_listing_pages(url, cookies, payload, max_pages=7, max_workers=3):
+def fetch_all_listing_pages(url: str, cookies: dict, payload: dict, max_pages: int = 7, max_workers: int = 3) -> list[requests.Response]:
+    """Input: url (str), cookies (dict), payload (dict), max_pages (int), max_workers (int).
+    Output: lista di requests.Response (only if pages are correctly fetched)."""
     with ThreadPoolExecutor(max_workers=max_workers) as ex:
         results = list(ex.map(fetch_listing_page, itertools.repeat(
             url), itertools.repeat(cookies), itertools.repeat(payload), range(1, max_pages+1)))
     return list(filter(lambda x: x, results))
 
 
-def write_csv(file):
+def write_csv(file: list[dict]) -> None:
+    """Input: file (list[dict]), one row for each company. Output: None; writes files/log.csv."""
     fieldnames = list(dict.fromkeys(key for info in file for key in info))
     with open("files/log.csv", "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames, restval="")
@@ -117,16 +134,19 @@ def write_csv(file):
         writer.writerows(file)
 
 
-def write_json(file):
+def write_json(file: list[dict]) -> None:
+    """Input: file (list[dict]), one field for each company. Output: None; writes files/log.json."""
     with open("files/log.json", "w") as f:
         json.dump(file, f, ensure_ascii=False, indent=2)
 
 
-def format_number(number):
+def format_number(number: int) -> str:
+    """Input: number (int). Output: 3 characters str with leading 0s (es. 7 -> '007')."""
     return "0"*(3 - len(str(number))) + str(number)
 
 
-def main():
+def main() -> None:
+    """Input: None. Output: None; orchestrates fetch/parsing and writes files/log.csv and files/log.json."""
     payload = setup_payload()
     cookies = setup_cookies()
     print("Fetching listing pages...")
