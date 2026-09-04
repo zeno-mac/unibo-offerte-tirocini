@@ -6,6 +6,8 @@ import sys
 from typing import Optional
 from counter import Counter
 from writer import write
+from file_checker import check_differences, log_differences
+import re
 
 LISTING_PATH = "gestioneaziendeconautocandidature.htm"
 BASE__URL = "https://tirocini.unibo.it/tirocini/studenti/"
@@ -91,7 +93,7 @@ def extract_companies(page: bytes, base_url: str) -> Optional[list[dict]]:
         return None
     rows += table.find_all('tr', class_="rigaPari")
     rows += table.find_all('tr', class_="rigaDispari")
-    return [{"name": row.td.a.p.get_text(strip=True), "url": base_url+row.td.a["href"]} for row in rows]
+    return [{"name": row.td.a.p.get_text(strip=True), "url": re.sub(r"page=\d+&", "", base_url+row.td.a["href"])} for row in rows]
 
 
 def extract_company_info(page: bytes, url: str) -> Optional[dict]:
@@ -101,7 +103,7 @@ def extract_company_info(page: bytes, url: str) -> Optional[dict]:
     soup = BeautifulSoup(page, "html.parser")
     table = soup.find("table", class_="tbSimpleData")
     dict = {
-        "Indirizzo dell'offerta": url
+        "Indirizzo dell'offerta:": url
     }
     if table is None:
         print(f"  [WARN] nessuna tabella 'tbSimpleData' in {url}")
@@ -151,6 +153,9 @@ def main() -> None:
 
     print(f"Numero di offerte :{len(companies_info)}")
     write(companies_info, "files/log", "Ragione Sociale:")
+    differences = check_differences("", "files/log.json", ["Indirizzo dell'offerta:", "Ragione Sociale:"])
+    log_differences(differences)
+    
 
 
 if __name__ == "__main__":
