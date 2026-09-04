@@ -24,8 +24,6 @@ class Counter(object):
             sys.stdout.write(
                 f"\r{self.msg}: {self.current_number()}/{str(self.end)}")
         self.current += 1
-        if self.current > self.end:
-            sys.stdout.write("\n")
         sys.stdout.flush()
         return self.current
 
