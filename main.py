@@ -47,8 +47,6 @@ def fetch_listing_page(url: str, cookies: dict, payload: dict, page_num: int = 1
     try:
         res = requests.post(url+"?page="+str(page_num),
                             cookies=cookies, data=payload)
-        with open(f"{page_num}.html", "w") as f:
-            f.write(str(res.content))
         res.raise_for_status()
     except requests.exceptions.HTTPError as e:
         print(
