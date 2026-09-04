@@ -7,7 +7,7 @@ import json
 import sys
 from typing import Optional
 from counter import startCounter
-
+from writer import write
 
 LISTING_PATH = "gestioneaziendeconautocandidature.htm"
 BASE__URL = "https://tirocini.unibo.it/tirocini/studenti/"
@@ -20,20 +20,18 @@ class SessionExpiredError(Exception):
 
 def setup_payload() -> dict:
     """Input: None. Output: dict with form data (key : 'data')."""
-    return {"data":
-            {
-                "denominazioneAzienda": "",
-                "provincia": "351",
-                "parolaChiave": "",
-                "nazione": "",
-                "settoreAttivita": "35",
-                "_flagConvenzioneTPVPsicologia": "on",
-                "cerca": "Search",
-                "form_submit": "true",
-            },
-            }
+    return {
+        "denominazioneAzienda": "",
+        "provincia": "351",
+        "parolaChiave": "",
+        "nazione": "",
+        "settoreAttivita": "35",
+        "_flagConvenzioneTPVPsicologia": "on",
+        "cerca": "Search",
+        "form_submit": "true",
+    }
 
-        
+
 def setup_cookies() -> dict:
     """Input: None (load JSESSIONID from .env). Output: dict {'JSESSIONID': str | None}."""
     load_dotenv()
@@ -49,10 +47,16 @@ def fetch_listing_page(url: str, cookies: dict, payload: dict, page_num: int = 1
     try:
         res = requests.post(url+"?page="+str(page_num),
                             cookies=cookies, data=payload)
+        with open(f"{page_num}.html", "w") as f:
+            f.write(str(res.content))
         res.raise_for_status()
-    except:
+    except requests.exceptions.HTTPError as e:
         print(
-            f"[WARNING] Error during fetching of {url}, status code: {res.status_code}")
+            f"\n[WARNING] HTTP Error during fetching of {url+"?page="+str(page_num)}, status code: {res.status_code}, headers: {res.headers}")
+
+    except requests.exceptions.RequestException as e:
+        print(
+            f"\n[WARNING] Error during fetching of {url+"?page="+str(page_num)}, status code:")
         return None
     return check_session(res)
 
@@ -126,27 +130,6 @@ def fetch_all_listing_pages(url: str, cookies: dict, payload: dict, max_pages: i
         if page:
             pages.append(page)
     return pages
-    
-
-
-def write_csv(file: list[dict]) -> None:
-    """Input: file (list[dict]), one row for each company. Output: None; writes files/log.csv."""
-    fieldnames = list(dict.fromkeys(key for info in file for key in info))
-    with open("files/log.csv", "w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=fieldnames, restval="")
-        writer.writeheader()
-        writer.writerows(file)
-
-
-def write_json(file: list[dict]) -> None:
-    """Input: file (list[dict]), one field for each company. Output: None; writes files/log.json."""
-    with open("files/log.json", "w") as f:
-        json.dump(file, f, ensure_ascii=False, indent=2)
-
-
-def format_number(number: int, digits: int) -> str:
-    """Input: number (int), digits (int). Output: 3 characters str with leading 0s (es. 7 -> '007')."""
-    return "0"*(digits - len(str(number))) + str(number)
 
 
 def main() -> None:
@@ -170,8 +153,8 @@ def main() -> None:
         companies_info.append(extract_company_info(
             page.content, company["url"]))
 
-    write_csv(companies_info)
-    write_json(companies_info)
+    print(f"Numero di offerte :{len(companies_info)}")
+    write(companies_info, "files/log", "Ragione Sociale:")
 
 
 if __name__ == "__main__":
