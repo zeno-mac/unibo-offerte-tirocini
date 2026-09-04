@@ -1,26 +1,37 @@
 import sys
 
-def startCounter(msg : str, start : int, end: int):
-    current = start
-    l = len(str(end))
-    def current_number() -> str:
-        nonlocal current
-        return "0"*(l - len(str(current))) + str(current)
-    
-    def step():
-        nonlocal current
-        nonlocal current_number
-        if current > end:
-            return current
-        if current == start:
-            sys.stdout.write(f"{msg}: {current_number()}/{str(end)}")
+class Counter(object):
+    msg = ""
+    current = 0
+    length = 0
+    end = 0
+
+    def __init__(self, msg: str, start: int, end: int):
+        self.msg = msg
+        self.current = start
+        self.end = end
+        self.length = len(str(end))
+        return
+
+    def current_number(self) -> str:
+        self.current
+        return "0"*(self.length - len(str(self.current))) + str(self.current)
+
+    def step(self):
+        if self.current > self.end:
+            return self.current
         else:
-            sys.stdout.write("\b"*(l*2 +1))
-            sys.stdout.write(f"{current_number()}/{str(end)}")
-        current+=1
-        if current > end:
+            sys.stdout.write(
+                f"\r{self.msg}: {self.current_number()}/{str(self.end)}")
+        self.current += 1
+        if self.current > self.end:
             sys.stdout.write("\n")
         sys.stdout.flush()
-        return current
-    
-    return step
+        return self.current
+
+    def __enter__(self):
+        return self.step
+
+    def __exit__(self, type, value, traceback):
+        print("")
+        

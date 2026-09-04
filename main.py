@@ -2,11 +2,9 @@ import requests
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 import os
-import csv
-import json
 import sys
 from typing import Optional
-from counter import startCounter
+from counter import Counter
 from writer import write
 
 LISTING_PATH = "gestioneaziendeconautocandidature.htm"
@@ -121,12 +119,12 @@ def fetch_all_listing_pages(url: str, cookies: dict, payload: dict, max_pages: i
     """Input: url (str), cookies (dict), payload (dict), max_pages (int), max_workers (int).
     Output: lista di requests.Response (only if pages are correctly fetched)."""
     pages = []
-    counter = startCounter("Listing pages loaded", 1, max_pages)
-    for i in range(1, max_pages+1):
-        counter()
-        page = fetch_listing_page(url, cookies, payload, i)
-        if page:
-            pages.append(page)
+    with Counter("Listing pages loaded", 1, max_pages) as counter:
+        for i in range(1, max_pages+1):
+            counter()
+            page = fetch_listing_page(url, cookies, payload, i)
+            if page:
+                pages.append(page)
     return pages
 
 
@@ -144,12 +142,12 @@ def main() -> None:
 
     companies_info = []
     print("Fetching and extracting companies pages...")
-    counter = startCounter("Offer pages loaded", 1, len(companies))
-    for company in companies:
-        counter()
-        page = fetch_company_page(url=company["url"], cookies=cookies)
-        companies_info.append(extract_company_info(
-            page.content, company["url"]))
+    with Counter("Offer pages loaded", 1, len(companies)) as counter:
+        for company in companies:
+            counter()
+            page = fetch_company_page(url=company["url"], cookies=cookies)
+            companies_info.append(extract_company_info(
+                page.content, company["url"]))
 
     print(f"Numero di offerte :{len(companies_info)}")
     write(companies_info, "files/log", "Ragione Sociale:")
