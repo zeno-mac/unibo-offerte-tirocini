@@ -33,7 +33,7 @@ def log_differences(data):
     if not data:
         print("No difference in files since last commit")
         return
-    print(f"Change in data: \n{"-" if data["len_diff"] < 0 else "+"}{data["len_diff"]} items")
+    print(f"Change in data: \n{"+" if data["len_diff"] > 0 else ""}{data["len_diff"]} total items")
     print(f"{(len(data["lost_items"]))} deleted items")
     print(f"{(len(data["new_items"]))} new items")
 
