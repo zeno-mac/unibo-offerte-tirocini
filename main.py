@@ -15,21 +15,28 @@ LISTING_PATH = "gestioneaziendeconautocandidature.htm"
 BASE__URL = "https://tirocini.unibo.it/tirocini/studenti/"
 MAX_RETRIES = 5
 
+
 class SessionValidityError(Exception):
     def __init__(self, msg="JSESSIONID is expired, please update .env"):
         super().__init__(msg)
 
+
 class WrongPageError(Exception):
     def __init__(self, target):
-        super().__init__(f"Incorrect page number after request, target: {target}")
+        super().__init__(
+            f"Incorrect page number after request, target: {target}")
+
 
 class IncorrectHTMLlayout(Exception):
     def __init__(self, target):
         super().__init__(f"Error during html parsing: {target}")
 
+
 class MaxRetriesReached(Exception):
     def __init__(self, url):
         super().__init__(f"Reached max attempts trying to fetch: {url}")
+
+
 def setup_payload() -> dict:
     """Input: None. Output: dict with form data (key : 'data')."""
     return {
@@ -52,15 +59,17 @@ def setup_cookies() -> dict:
         raise SessionValidityError("[ERROR] JSESSIONID is missing in .env")
     return {"JSESSIONID": token}
 
+
 def check_correct_page(data, page_num):
     if f"Pagina {page_num}/" not in data.text:
         raise WrongPageError(page_num)
+
 
 def fetch_listing_page(url: str, cookies: dict, payload: dict, page_num: int = 1) -> Optional[requests.Response]:
     """Input: url (str), cookies (dict), payload (dict), page_num (int).
     Output: requests.Response of listing page or None in case of HTTP errors."""
     attempts = 0
-    while attempts <MAX_RETRIES:
+    while attempts < MAX_RETRIES:
         try:
             res = requests.post(url+"?page="+str(page_num),
                                 cookies=cookies, data=payload)
@@ -86,7 +95,6 @@ def fetch_listing_page(url: str, cookies: dict, payload: dict, page_num: int = 1
             attempts += 1
             sleep(0.5)
     raise MaxRetriesReached(url+"?page="+str(page_num))
-    
 
 
 def check_session(res: requests.Response) -> requests.Response:
@@ -180,9 +188,9 @@ def main() -> None:
 
     print(f"Numero di offerte :{len(companies_info)}")
     write(companies_info, "files/log", "Ragione Sociale:")
-    differences = check_differences("", "files/log.json", ["Indirizzo dell'offerta:", "Ragione Sociale:"])
+    differences = check_differences(
+        "", "files/log.json", ["Indirizzo dell'offerta:", "Ragione Sociale:"])
     log_differences(differences)
-    
 
 
 if __name__ == "__main__":
