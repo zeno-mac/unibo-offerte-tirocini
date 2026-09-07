@@ -9,7 +9,7 @@ from writer import write
 from file_checker import check_differences, log_differences
 import re
 from time import sleep
-
+from login import login
 
 LISTING_PATH = "gestioneaziendeconautocandidature.htm"
 BASE__URL = "https://tirocini.unibo.it/tirocini/studenti/"
@@ -53,11 +53,11 @@ def setup_payload() -> dict:
 
 def setup_cookies() -> dict:
     """Input: None (load JSESSIONID from .env). Output: dict {'JSESSIONID': str | None}."""
-    load_dotenv()
-    token = os.getenv('JSESSIONID')
-    if not token:
-        raise SessionValidityError("[ERROR] JSESSIONID is missing in .env")
-    return {"JSESSIONID": token}
+    #load_dotenv()
+    #token = os.getenv('JSESSIONID')
+    #if not token:
+    #    raise SessionValidityError("[ERROR] JSESSIONID is missing in .env")
+    return {"JSESSIONID": login()}
 
 
 def check_correct_page(data, page_num):
