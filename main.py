@@ -79,11 +79,11 @@ def fetch_listing_page(url: str, cookies: dict, payload: dict, page_num: int = 1
             return res
         except requests.exceptions.HTTPError as e:
             print(
-                f"\n[WARNING] HTTP Error during fetching of {url+"?page="+str(page_num)}, status code: {res.status_code}, headers: {res.headers}")
+                f"\n[WARNING] HTTP Error during fetching of {url+"?page="+str(page_num)}, error: {e}, headers: {res.headers}")
 
         except requests.exceptions.RequestException as e:
             print(
-                f"\n[WARNING] Error during fetching of {url+"?page="+str(page_num)}, status code:")
+                f"\n[WARNING] Error during fetching of {url+"?page="+str(page_num)}, error: {e}")
 
         except WrongPageError as e:
             print("\n[WARNING] " + str(e))
@@ -96,7 +96,8 @@ def fetch_listing_page(url: str, cookies: dict, payload: dict, page_num: int = 1
 def check_session(res: requests.Response) -> requests.Response:
     """Input: res (requests.Response). Output: same response if session is valid;
     raise SessionExpiredError if JSESSIONID is expired."""
-    if "La tua sessione" in res.text and "scaduta" in res.text:
+
+    if "La tua sessione" in res.text and "scaduta" in res.text or "idp.unibo.it" in res.url:
         raise SessionValidityError(
             "JSESSIONID is expired, please update .env"
         )
