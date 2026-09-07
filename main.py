@@ -80,20 +80,16 @@ def fetch_listing_page(url: str, cookies: dict, payload: dict, page_num: int = 1
         except requests.exceptions.HTTPError as e:
             print(
                 f"\n[WARNING] HTTP Error during fetching of {url+"?page="+str(page_num)}, status code: {res.status_code}, headers: {res.headers}")
-            attempts += 1
-            sleep(0.5)
 
         except requests.exceptions.RequestException as e:
             print(
                 f"\n[WARNING] Error during fetching of {url+"?page="+str(page_num)}, status code:")
-            attempts += 1
-            sleep(0.5)
 
         except WrongPageError as e:
-            print("[WARNING] " + str(e))
+            print("\n[WARNING] " + str(e))
             print("Retrying...")
-            attempts += 1
-            sleep(0.5)
+        attempts += 1
+        sleep(0.5)
     raise MaxRetriesReached(url+"?page="+str(page_num))
 
 
@@ -110,14 +106,19 @@ def check_session(res: requests.Response) -> requests.Response:
 def fetch_company_page(url: str, cookies: dict) -> Optional[requests.Response]:
     """Input: url (str) of the company page, cookies (dict).
     Output: requests.Response or None in case of HTTP errors."""
-    try:
-        res = requests.get(url=url, cookies=cookies)
-        res.raise_for_status()
-    except:
-        print(
-            f"[WARNING] Error during fetching of {url}, status code: {res.status_code}")
-        return None
-    return res
+    attemps = 0
+    while attemps < MAX_RETRIES:
+        try:
+            res = requests.get(url=url, cookies=cookies)
+            res.raise_for_status()
+            return res
+        except (requests.exceptions.HTTPError, requests.exceptions.RequestException) as e:
+            print(
+                f"\n[WARNING] Error during fetching of {url}, status code: {e}")
+            print("Retrying...")
+        attemps += 1
+        sleep(0.5)
+    raise MaxRetriesReached(url)
 
 
 def extract_companies(page: bytes, base_url: str) -> Optional[list[dict]]:
