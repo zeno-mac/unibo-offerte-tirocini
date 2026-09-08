@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Offerte Tirocini &middot; UniBo</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="topbar">
+        <div class="brand">
+            <h1>Offerte Tirocini</h1>
+            <span class="brand-sub">UniBo &middot; Bologna</span>
+        </div>
+        <div class="search">
+            <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 4a6 6 0 1 1 0 12 6 6 0 0 1 0-12zm0-2a8 8 0 1 0 4.9 14.32l4.4 4.39 1.4-1.42-4.38-4.38A8 8 0 0 0 10 2z"/></svg>
+            <input type="search" id="search" placeholder="Cerca azienda, descrizione, attività, comune…" autocomplete="off" spellcheck="false">
+        </div>
+    </header>
+
+    <div class="layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-head">
+                <span>Filtri</span>
+                <button type="button" id="clear-filters" class="link-btn">Azzera</button>
+            </div>
+
+            <section class="filter-group">
+                <h3>Ordina per</h3>
+                <select id="sort">
+                    <option value="az">Azienda (A → Z)</option>
+                    <option value="za">Azienda (Z → A)</option>
+                    <option value="comune">Comune (A → Z)</option>
+                    <option value="recent">Più recenti</option>
+                </select>
+            </section>
+
+            <section class="filter-group">
+                <h3>Tipo azienda/ente</h3>
+                <div class="checks" id="tipo-checks"></div>
+            </section>
+
+            <section class="filter-group">
+                <h3>Comune</h3>
+                <select id="comune">
+                    <option value="">Tutti i comuni</option>
+                </select>
+            </section>
+
+            <section class="filter-group">
+                <h3>Altro</h3>
+                <label class="check"><input type="checkbox" id="f-note"> <span>Solo con note</span></label>
+                <label class="check"><input type="checkbox" id="f-web"> <span>Solo con sito web</span></label>
+                <label class="check"><input type="checkbox" id="f-email"> <span>Solo con email</span></label>
+            </section>
+        </aside>
+
+        <main class="results">
+            <div class="results-head">
+                <button type="button" id="toggle-filters" class="pill-btn">Filtri</button>
+                <span id="count" class="count"></span>
+            </div>
+            <div class="card-grid" id="card-grid"></div>
+            <p class="notice" id="notice" hidden></p>
+        </main>
+    </div>
+
+    <div class="scrim" id="scrim"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
