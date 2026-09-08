@@ -17,7 +17,8 @@ BASE__URL = "https://tirocini.unibo.it/tirocini/studenti/"
 
 
 def setup_payload() -> dict:
-    """Input: None. Output: dict with form data (key : 'data')."""
+    """Input: None. Output: dict of search-form fields sent as the POST body
+    of the listing request (province, activity sector, keyword, ...)."""
     return {
         "denominazioneAzienda": "",
         "provincia": "351",
@@ -31,16 +32,18 @@ def setup_payload() -> dict:
 
 
 def setup_cookies() -> dict:
-    """Input: None (load JSESSIONID from .env). Output: dict {'JSESSIONID': str | None}."""
-    # load_dotenv()
-    # token = os.getenv('JSESSIONID')
-    # if not token:
-    #    raise SessionValidityError("[ERROR] JSESSIONID is missing in .env")
+    """Input: None. Output: dict {'JSESSIONID': str}; performs the SAML login
+    flow (login.login()) and returns the fresh session cookie."""
     return {"JSESSIONID": login()}
 
 
 def main() -> None:
-    """Input: None. Output: None; orchestrates fetch/parsing and writes files/log.csv and files/log.json."""
+    """Input: None. Output: None.
+
+    Orchestrates the run: log in, fetch the listing pages, parse the company
+    URLs out of them, fetch and parse each company page, then write the
+    results to files/log.json and files/log.csv and log the diff against the
+    last committed version."""
     payload = setup_payload()
     cookies = setup_cookies()
     print("Fetching listing pages...")

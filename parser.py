@@ -1,5 +1,4 @@
 from bs4 import BeautifulSoup
-from typing import Optional
 import re
 
 
@@ -8,9 +7,11 @@ class IncorrectHTMLlayout(Exception):
         super().__init__(f"Error during html parsing: {target}")
 
 
-def extract_companies(page: bytes, base_url: str) -> Optional[list[dict]]:
-    """Input: page (bytes/str, HTML della pagina di elenco), base_url (str).
-    Output: list of dict {'name': str, 'url': str}, or None if table is not present."""
+def extract_companies(page: bytes, base_url: str) -> list[dict]:
+    """Input: page (bytes/str, HTML of a listing page), base_url (str).
+    Output: list of dict {'name': str, 'url': str}, one per company row, with
+    the 'page=N&' query param stripped from each URL.
+    Raises IncorrectHTMLlayout if the results table is missing."""
     rows = []
     soup = BeautifulSoup(page, "html.parser")
     table = soup.find('table', class_="iceDataTblOutline")
@@ -21,10 +22,11 @@ def extract_companies(page: bytes, base_url: str) -> Optional[list[dict]]:
     return [{"name": row.td.a.p.get_text(strip=True), "url": re.sub(r"page=\d+&", "", base_url+row.td.a["href"])} for row in rows]
 
 
-def extract_company_info(page: bytes, url: str) -> Optional[dict]:
-    """Input: page (bytes/str, HTML of the company page), url (str).
-    Output: dict {field: value} with "Offer url",
-    or None if table is not present."""
+def extract_company_info(page: bytes, url: str) -> dict:
+    """Input: page (bytes/str, HTML of a company page), url (str).
+    Output: dict {field label: value} scraped from the detail table, plus
+    "Indirizzo dell'offerta:" set to url.
+    Raises IncorrectHTMLlayout if the detail table is missing."""
     soup = BeautifulSoup(page, "html.parser")
     table = soup.find("table", class_="tbSimpleData")
     dict = {
