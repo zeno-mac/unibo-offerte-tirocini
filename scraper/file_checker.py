@@ -2,7 +2,7 @@ import git
 import os
 import json
 from typing import Optional
-
+import sys
 
 def load_file(path2repo: str, path2file: str) -> Optional[list[dict]]:
     """Input: path2repo (str), path2file (str), payload (dict), page_num (int).
@@ -33,13 +33,13 @@ def log_differences(data):
     if not data:
         print("No difference in files since last commit")
         return
-    print(f"Change in data: \n{"+" if data["len_diff"] > 0 else ""}{data["len_diff"]} total items")
+    print(f"Change in data: \n{"+" if data["len_diff"] < 0 else ""}{data["len_diff"]} total items")
     print(f"{(len(data["lost_items"]))} deleted items")
     print(f"{(len(data["new_items"]))} new items")
 
 def check_differences(path2repo: str, path2file: str, keys: list[str]) -> dict:
     old_data = load_file(path2repo, path2file)
-    if not old_data:
+    if old_data is None:
         return None
     with open(path2file, "r") as f:
         new_data = json.load(f)
@@ -54,8 +54,12 @@ def check_differences(path2repo: str, path2file: str, keys: list[str]) -> dict:
 
 
 def main():
-    diffs = check_differences("", "files/log.json",
-                      ["Indirizzo dell'offerta:", "Ragione Sociale:"])
+    try:
+        diffs = check_differences("", "files/log.json",
+                        ["Indirizzo dell'offerta:", "Ragione Sociale:"])
+    except json.JSONDecodeError as e:
+        print(f"[ERROR] previous version is not valid JSON: {e}")
+        sys.exit(1)
     log_differences(diffs)
 
 
