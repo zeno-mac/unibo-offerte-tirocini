@@ -66,9 +66,6 @@ def main() -> None:
 
     print(f"Numero di offerte :{len(companies_info)}")
     write(companies_info, "files/log", "Ragione Sociale:")
-    differences = check_differences(
-        "", "files/log.json", ["Indirizzo dell'offerta:", "Ragione Sociale:"])
-    log_differences(differences)
 
 
 if __name__ == "__main__":

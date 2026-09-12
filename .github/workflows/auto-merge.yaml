@@ -1,0 +1,44 @@
+name: Auto-merge
+on: pull_request
+
+permissions:
+  pull-requests: write
+  contents: write
+
+jobs:
+  bot-guard:
+    if: github.event.pull_request.head.ref == 'data/refresh' && github.event.pull_request.user.id == 184540658
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Assert only log files changed
+        run: |
+          base_ref='${{ github.event.pull_request.base.ref }}'
+          git fetch --no-tags origin "$base_ref"
+          changed="$(git diff --name-only "origin/$base_ref...HEAD")"
+          echo "Changed files:"; echo "$changed"
+          bad="$(echo "$changed" | grep -Ev '^files/log\.(json|csv)$' || true)"
+          if [ -n "$bad" ]; then
+            echo "::error::PR changes files outside the allowlist:"; echo "$bad"
+            exit 1
+          fi
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+
+      - name: Validate log.json items
+        run: python scraper/validate.py
+
+  automerge:
+    needs: bot-guard
+    runs-on: ubuntu-latest
+    steps:
+    - name: Enable Pull Request Automerge
+      run: gh pr merge --rebase --auto --repo "${{ github.repository }}" "${{ github.event.pull_request.number }}"
+      env:
+        GH_TOKEN: ${{ secrets.GH_PAT }}
