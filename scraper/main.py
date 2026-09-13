@@ -37,17 +37,7 @@ def setup_cookies() -> dict:
     return {"JSESSIONID": login()}
 
 
-def main() -> None:
-    """Input: None. Output: None.
-
-    Orchestrates the run: log in, fetch the listing pages, parse the company
-    URLs out of them, fetch and parse each company page, then write the
-    results to files/log.json and files/log.csv and log the diff against the
-    last committed version."""
-    payload = setup_payload()
-    cookies = setup_cookies()
-    print("Fetching listing pages...")
-
+def start_company_offers_scrape(cookies, payload):
     sc = scraper.Scraper(cookies=cookies, payload=payload, headers={})
     pages = sc.fetch_all_listing_pages(max_pages=7)
     companies = []
@@ -66,6 +56,19 @@ def main() -> None:
 
     print(f"Numero di offerte :{len(companies_info)}")
     write(companies_info, "files/log", "Ragione Sociale:")
+
+
+def main() -> None:
+    """Input: None. Output: None.
+    Orchestrates the run: log in, fetch the listing pages, parse the company
+    URLs out of them, fetch and parse each company page, then write the
+    results to files/log.json and files/log.csv and log the diff against the
+    last committed version."""
+    payload = setup_payload()
+    cookies = setup_cookies()
+    print("Fetching listing pages...")
+
+    start_company_offers_scrape(cookies=cookies, payload=payload)
 
 
 if __name__ == "__main__":
