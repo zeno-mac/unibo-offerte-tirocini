@@ -43,6 +43,9 @@ def extract_company_info(page: bytes, url: str) -> dict:
     return dict
 
 def extract_max_pages(page):
+    """Input: page (bytes/str, HTML of a listing page). Output: int, the
+    total number of listing pages read from the "Pagina X/Y" pager text.
+    Raises IncorrectHTMLlayout if the pager cell or its text is missing."""
     soup = BeautifulSoup(page, "html.parser")
     td = soup.find("td", class_ = "icePnlGrdColumn2")
     if td is None:

@@ -5,6 +5,12 @@ import os
 from dotenv import load_dotenv
 
 def login():
+    """Input: None; reads UNIBO_MAIL and UNIBO_PASSWORD from the .env file.
+    Output: str, the JSESSIONID cookie for an authenticated session.
+    Walks the unibo.it -> AD (SAML) -> unibo.it login redirect chain:
+    fetches the login page, follows the identity-provider redirect,
+    submits the AD credentials, then posts the resulting SAML response
+    back to unibo.it to complete the session."""
     url = "https://tirocini.unibo.it/tirocini/studenti/homePageStudenti.htm"
 
     session = requests.Session()

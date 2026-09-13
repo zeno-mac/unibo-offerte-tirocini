@@ -38,6 +38,11 @@ def setup_cookies() -> dict:
 
 
 def start_extracurricular_offers_scrape(cookies, payload, config):
+    """Input: cookies (dict), payload (dict) from setup_cookies/setup_payload,
+    config (dict) as returned by load_config(). Output: None.
+    Fetches every listing page, extracts each company's URL, fetches and
+    parses each company page, then writes the results to the path
+    configured under config["extracurricular_internship"]."""
     sc = scraper.Scraper(cookies=cookies, payload=payload, headers={})
     pages = sc.fetch_all_listing_pages()
     companies = []

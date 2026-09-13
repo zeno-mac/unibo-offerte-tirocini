@@ -3,6 +3,10 @@ import sys
 from config import load_config
 
 def validate(file, keys):
+    """Input: file (str) path to a JSON file containing a list of dicts,
+    keys (list[str]) fields each item must have a non-None value for.
+    Output: None; prints a per-item [ERROR] and exits with status 1 on the
+    first item missing one of keys, otherwise prints a success summary."""
     with open(file, "r") as f:
         items = json.load(f)
     for item in items:

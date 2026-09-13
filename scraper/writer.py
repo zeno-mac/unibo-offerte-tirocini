@@ -3,7 +3,8 @@ import csv
 import os
 
 def write_json(data: list[dict], path : str) -> None:
-    """Input: file (list[dict]), path : str, one field for each company. Output: None; writes <path>json."""
+    """Input: data (list[dict]), path : str. Output: None; writes data as
+    JSON to path (UTF-8, human-readable, 2-space indent)."""
     with open(path , "w") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
@@ -24,7 +25,10 @@ def create_dir(path : str) -> None:
         
     
 def write(data: list[dict], path:str, key : str) -> None:
-    """Input: file (list[dict]), path : str, key : str. Output: None; writes <path>json. and  <path>.csv with elements sorted by key"""
+    """Input: data (list[dict]), path (str) output JSON file path, key (str)
+    dict key to sort data by before writing (skipped if falsy). Output:
+    None; creates the parent directory of path if needed, then writes data
+    as JSON to path via write_json."""
     create_dir(path)
     if(key):
         data.sort(key = lambda x : x[key])
