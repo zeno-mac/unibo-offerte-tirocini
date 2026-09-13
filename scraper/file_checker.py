@@ -3,7 +3,7 @@ import os
 import json
 from typing import Optional
 import sys
-
+from config import load_config
 
 def load_file(path2repo: str, path2file: str) -> Optional[list[dict]]:
     """Input: path2repo (str), path2file (str), payload (dict), page_num (int).
@@ -91,9 +91,11 @@ def emit_output(name, value):
 
 
 def main():
+    config = load_config()
     try:
-        diffs = check_differences("", "files/log.json",
-                                  ["Indirizzo dell'offerta:", "Ragione Sociale:"])
+
+        diffs = check_differences("", config["extracurricular_internship"]["file_path"],
+                                  config["extracurricular_internship"]["keys"])
     except json.JSONDecodeError as e:
         print(f"[ERROR] previous version is not valid JSON: {e}")
         sys.exit(1)

@@ -11,10 +11,10 @@ import scraper
 import parser
 from time import sleep
 from login import login
+from config import load_config
 
 
 BASE__URL = "https://tirocini.unibo.it/tirocini/studenti/"
-
 
 def setup_payload() -> dict:
     """Input: None. Output: dict of search-form fields sent as the POST body
@@ -37,7 +37,7 @@ def setup_cookies() -> dict:
     return {"JSESSIONID": login()}
 
 
-def start_company_offers_scrape(cookies, payload):
+def start_company_offers_scrape(cookies, payload, config):
     sc = scraper.Scraper(cookies=cookies, payload=payload, headers={})
     pages = sc.fetch_all_listing_pages(max_pages=7)
     companies = []
@@ -55,24 +55,25 @@ def start_company_offers_scrape(cookies, payload):
                 page.text, company["url"]))
 
     print(f"Numero di offerte :{len(companies_info)}")
-    write(companies_info, "files/log", "Ragione Sociale:")
+    write(companies_info, config["extracurricular_internship"]["file_path"], config["extracurricular_internship"]["sorting_key"])
 
 
-def main() -> None:
+def main(config) -> None:
     """Input: None. Output: None.
     Orchestrates the run: log in, fetch the listing pages, parse the company
     URLs out of them, fetch and parse each company page, then write the
-    results to files/log.json and files/log.csv and log the diff against the
+    results to data/ and log the diff against the
     last committed version."""
+
     payload = setup_payload()
     cookies = setup_cookies()
     print("Fetching listing pages...")
 
-    start_company_offers_scrape(cookies=cookies, payload=payload)
+    start_company_offers_scrape(cookies=cookies, payload=payload, config=config)
 
 
 if __name__ == "__main__":
     try:
-        main()
+        main(load_config())
     except (scraper.SessionValidityError, scraper.MaxRetriesReached, parser.IncorrectHTMLlayout) as e:
         sys.exit(f"[ERROR] {e}")

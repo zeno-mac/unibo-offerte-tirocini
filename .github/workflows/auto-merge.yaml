@@ -20,7 +20,7 @@ jobs:
           git fetch --no-tags origin "$base_ref"
           changed="$(git diff --name-only "origin/$base_ref...HEAD")"
           echo "Changed files:"; echo "$changed"
-          bad="$(echo "$changed" | grep -Ev '^files/log\.(json|csv)$' || true)"
+          bad="$(echo "$changed" | grep -Ev '^data/[^/]+\.json$' || true)"
           if [ -n "$bad" ]; then
             echo "::error::PR changes files outside the allowlist:"; echo "$bad"
             exit 1

@@ -1,6 +1,6 @@
 import json
 import sys
-
+from config import load_config
 
 def validate(file, keys):
     with open(file, "r") as f:
@@ -14,4 +14,5 @@ def validate(file, keys):
 
 
 if __name__ == "__main__":
-    validate("files/log.json", ["Ragione Sociale:", "Indirizzo dell'offerta:"])
+    config =load_config()
+    validate(config["extracurricular_internship"]["file_path"], config["extracurricular_internship"]["keys"])

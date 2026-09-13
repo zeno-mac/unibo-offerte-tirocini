@@ -1,0 +1,16 @@
+{
+    "extracurricular_internship": {
+        "file_path": "data/extracurricular_internship_log.json",
+        "keys": [
+            "Indirizzo dell'offerta:",
+            "Ragione Sociale:"
+        ],
+        "sorting_key" : "Ragione Sociale:"
+    },
+    "curricular_internship": {
+        "file_path": "data/curricular_internship_log.json",
+        "keys": [
+        ],
+        "sorting_key" : ""
+    }
+}
