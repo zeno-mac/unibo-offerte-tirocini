@@ -2,18 +2,9 @@ import json
 import csv
 import os
 
-def write_csv(data: list[dict], path : str) -> None:
-    """Input: file (list[dict]), path : str, one row for each company. Output: None; writes <path>.csv."""
-    fieldnames = list(dict.fromkeys(key for info in data for key in info))
-    with open(path + ".csv", "w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=fieldnames, restval="")
-        writer.writeheader()
-        writer.writerows(data)
-
-
 def write_json(data: list[dict], path : str) -> None:
     """Input: file (list[dict]), path : str, one field for each company. Output: None; writes <path>json."""
-    with open(path + ".json", "w") as f:
+    with open(path , "w") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
 def get_dir(path : str) -> str:
@@ -38,6 +29,5 @@ def write(data: list[dict], path:str, key : str) -> None:
     if(key):
         data.sort(key = lambda x : x[key])
     write_json(data, path)
-    write_csv(data,path)
     return 
     
