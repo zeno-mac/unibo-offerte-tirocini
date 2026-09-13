@@ -2,7 +2,7 @@
 
 /* ---------- Data source ---------- */
 // Served from the project root (e.g. Live Server) the JSON sits one level up.
-const DATA_URL = "../files/log.json";
+const DATA_URL = "../data/extracurricular_internship_log.json";
 
 const FIELDS = {
     url: "Indirizzo dell'offerta:",
