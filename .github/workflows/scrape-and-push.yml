@@ -34,7 +34,7 @@ jobs:
       uses: peter-evans/create-pull-request@v7
       with:
         token: ${{ secrets.GH_PAT}}
-        add-paths: files/log.json,files/log.csv
+        add-paths: data/*.json
         branch: data/refresh
         title: "data: refresh offers #${{ github.run_number }}"
         body: |
