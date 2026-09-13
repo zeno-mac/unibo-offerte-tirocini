@@ -2,6 +2,7 @@
 import requests
 from counter import Counter
 from time import sleep
+from parser import extract_max_pages
 
 MAX_RETRIES = 5
 
@@ -86,13 +87,18 @@ class Scraper():
             sleep(0.5)
         raise MaxRetriesReached(url)
 
-    def fetch_all_listing_pages(self, max_pages: int = 7) -> list[requests.Response]:
+    def fetch_all_listing_pages(self, max_pages = None) -> list[requests.Response]:
         """Input: max_pages (int). Fetches listing pages 1..max_pages in order.
         Output: list of requests.Response, one per page. Propagates
         MaxRetriesReached / SessionValidityError from fetch_listing_page."""
         pages = []
+        p = self.fetch_listing_page(1)
+        pages.append(p)
+        if max_pages is None:
+            max_pages = extract_max_pages(p.content)
         with Counter("Listing pages loaded", 1, max_pages) as counter:
-            for i in range(1, max_pages+1):
+            counter()
+            for i in range(2, max_pages+1):
                 counter()
                 page = self.fetch_listing_page(i)
                 pages.append(page)
@@ -104,7 +110,6 @@ def check_correct_page(data, page_num):
     (the site silently falls back to page 1 for out-of-range requests)."""
     if f"Pagina {page_num}/" not in data.text:
         raise WrongPageError(page_num)
-
 
 def check_session(res: requests.Response) -> requests.Response:
     """Input: res (requests.Response). Output: the same response if the session

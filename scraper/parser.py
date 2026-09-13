@@ -41,3 +41,13 @@ def extract_company_info(page: bytes, url: str) -> dict:
             dict[name.get_text(strip=True)] = value.get_text(
                 separator=" ", strip=True)
     return dict
+
+def extract_max_pages(page):
+    soup = BeautifulSoup(page, "html.parser")
+    td = soup.find("td", class_ = "icePnlGrdColumn2")
+    if td is None:
+        raise IncorrectHTMLlayout("td class=icePnlGrdColumn2")
+    match = re.search(r"Pagina\s+\d+/(\d+)", td.get_text())
+    if match is None:
+        raise IncorrectHTMLlayout("'Pagina X/Y' text in td class=icePnlGrdColumn2")
+    return int(match.group(1))

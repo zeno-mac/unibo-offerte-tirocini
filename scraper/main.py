@@ -37,9 +37,9 @@ def setup_cookies() -> dict:
     return {"JSESSIONID": login()}
 
 
-def start_company_offers_scrape(cookies, payload, config):
+def start_extracurricular_offers_scrape(cookies, payload, config):
     sc = scraper.Scraper(cookies=cookies, payload=payload, headers={})
-    pages = sc.fetch_all_listing_pages(max_pages=7)
+    pages = sc.fetch_all_listing_pages()
     companies = []
     print("Extracting companies urls...")
     for page in pages:
@@ -69,7 +69,7 @@ def main(config) -> None:
     cookies = setup_cookies()
     print("Fetching listing pages...")
 
-    start_company_offers_scrape(cookies=cookies, payload=payload, config=config)
+    start_extracurricular_offers_scrape(cookies=cookies, payload=payload, config=config)
 
 
 if __name__ == "__main__":
