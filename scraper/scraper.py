@@ -87,6 +87,7 @@ class Scraper():
             try:
                 res = requests.get(url=url, cookies=self.cookies)
                 res.raise_for_status()
+                check_session(res)
                 return res
             except (requests.exceptions.HTTPError, requests.exceptions.RequestException) as e:
                 print(
