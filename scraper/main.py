@@ -117,7 +117,7 @@ def start_curricular_offers_scrape(sc):
     offers = []
     for url, page in zip(urls, pages):
             offers.append(
-                parser.extract_curricular_offer(page.text, url))
+                parser.extract_extracurricular_offer(page.text, url))
     write(offers, "data/curricular_internship_log.json", "")
 
 
