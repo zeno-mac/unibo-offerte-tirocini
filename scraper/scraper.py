@@ -7,7 +7,8 @@ from parser import extract_max_pages
 MAX_RETRIES = 5
 
 BASE__URL = "https://tirocini.unibo.it/tirocini/studenti/"
-LISTING_URL = BASE__URL + "gestioneaziendeconautocandidature.htm"
+EXTRACURRICULAR_URL = BASE__URL + "gestioneaziendeconautocandidature.htm"
+CURRICULAR_URL = BASE__URL + "gestioneoffertetirocinio.htm"
 
 
 class SessionValidityError(Exception):
@@ -31,12 +32,13 @@ class Scraper():
     listing and company pages with retry handling."""
     cookies = {}
     headers = {}
-    payload = {}
+    extracurricular_payload = {}
 
-    def __init__(self, cookies, headers, payload):
+    def __init__(self, cookies, headers, extracurricular_payload={}, curricular_payload={}):
         self.cookies = cookies
         self.headers = headers
-        self.payload = payload
+        self.extracurricular_payload = extracurricular_payload
+        self.curricular_payload = curricular_payload
 
     def fetch_all_extracurricular_offer_pages(self, urls):
         offer_pages = []
@@ -56,26 +58,27 @@ class Scraper():
         attempts = 0
         while attempts < MAX_RETRIES:
             try:
-                res = requests.post(LISTING_URL+"?page="+str(page_num),
-                                    cookies=self.cookies, data=self.payload)
+                res = requests.post(EXTRACURRICULAR_URL+"?page="+str(page_num),
+                                    cookies=self.cookies, data=self.extracurricular_payload)
+
                 res.raise_for_status()
                 check_session(res)
                 check_correct_page(res, page_num)
                 return res
             except requests.exceptions.HTTPError as e:
                 print(
-                    f"\n[WARNING] HTTP Error during fetching of {LISTING_URL+"?page="+str(page_num)}, error: {e}, headers: {res.headers}")
+                    f"\n[WARNING] HTTP Error during fetching of {EXTRACURRICULAR_URL+"?page="+str(page_num)}, error: {e}, headers: {res.headers}")
 
             except requests.exceptions.RequestException as e:
                 print(
-                    f"\n[WARNING] Error during fetching of {LISTING_URL+"?page="+str(page_num)}, error: {e}")
+                    f"\n[WARNING] Error during fetching of {EXTRACURRICULAR_URL+"?page="+str(page_num)}, error: {e}")
 
             except WrongPageError as e:
                 print("\n[WARNING] " + str(e))
                 print("Retrying...")
             attempts += 1
             sleep(0.5)
-        raise MaxRetriesReached(LISTING_URL+"?page="+str(page_num))
+        raise MaxRetriesReached(EXTRACURRICULAR_URL+"?page="+str(page_num))
 
     def fetch_extracurricular_offer(self, url: str) -> requests.Response:
         """Input: url (str) of a company page. Uses self.cookies.
@@ -114,11 +117,54 @@ class Scraper():
                 pages.append(page)
         return pages
 
+    def fetch_curricular_listing_page(self, page_num=1):
+        attempts = 0
+        url = "https://tirocini.unibo.it/tirocini/studenti/gestioneoffertetirocinio.htm?idTipoTirocinio=2&idCarriera=1"
+        while attempts < MAX_RETRIES:
+            try:
+                res = requests.post(url, cookies=self.cookies,
+                                    data=self.curricular_payload)
+                res.raise_for_status()
+                check_session(res)
+                check_correct_page(res, page_num)
+                return res
+            except requests.exceptions.HTTPError as e:
+                print(
+                    f"\n[WARNING] HTTP Error during fetching of {url}, error: {e}, headers: {res.headers}")
+
+            except requests.exceptions.RequestException as e:
+                print(
+                    f"\n[WARNING] Error during fetching of {url}, error: {e}")
+
+            except WrongPageError as e:
+                print("\n[WARNING] " + str(e))
+                print("Retrying...")
+            attempts += 1
+            sleep(0.5)
+        raise MaxRetriesReached(EXTRACURRICULAR_URL+"?page="+str(page_num))
+
+    def fetch_all_curricular_listing_pages(self, max_pages=None):
+        # TODO
+        return None
+
+    def fetch_curricular_offer_page(self, url):
+        # TODO
+        return None
+
+    def fetch_all_curricular_offer_pages(self, urls):
+        # TODO
+        return None
+
 
 def check_correct_page(data, page_num):
     """Input: data (requests.Response), page_num (int). Output: None.
     Raises WrongPageError if the response body is not the requested page
     (the site silently falls back to page 1 for out-of-range requests)."""
+    # If the listing page only has one page there is icePnlGrdRow1 tr containing the current page
+    if ("icePnlGrdRow1" not in data.text):
+        if (page_num != 1):
+            raise WrongPageError(page_num)
+        return
     if f"Pagina {page_num}/" not in data.text:
         raise WrongPageError(page_num)
 

@@ -53,6 +53,6 @@ def extract_max_pages(page):
         raise IncorrectHTMLlayout("td class=icePnlGrdColumn2")
     match = re.search(r"Pagina\s+\d+/(\d+)", td.get_text())
     if match is None:
-        raise IncorrectHTMLlayout(
-            "'Pagina X/Y' text in td class=icePnlGrdColumn2")
+        print("[WARNING] No max_page found, defaulting to 1...")
+        return 1
     return int(match.group(1))
