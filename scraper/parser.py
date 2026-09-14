@@ -28,7 +28,7 @@ def extract_extracurricular_offer(page: bytes, url: str) -> dict:
     "Indirizzo dell'offerta:" set to url.
     Raises IncorrectHTMLlayout if the detail table is missing."""
     soup = BeautifulSoup(page, "html.parser")
-    table = soup.find("table", class_="tbSimpleData")
+    table = soup.find("table", class_="tbSimpleData", summary="Tabella di struttura")
     dict = {
         "Indirizzo dell'offerta:": url
     }

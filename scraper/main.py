@@ -97,6 +97,9 @@ def start_extracurricular_offers_scrape(sc, config):
     offer_info = []
     print("Fetching and extracting companies pages...")
     company_pages = sc.fetch_all_extracurricular_offer_pages(offer_urls)
+    for i in range (0, len(pages)):
+        with open("test/extra_offer/offer" + str(i) + ".html", "w") as f:
+            f.write(pages[i].text)
     for url, page in zip(offer_urls, company_pages):
         offer_info.append(
             parser.extract_extracurricular_offer(page.text, url))
@@ -108,10 +111,14 @@ def start_extracurricular_offers_scrape(sc, config):
 
 def start_curricular_offers_scrape(sc):
     res = sc.fetch_curricular_listing_page()
-    soup = BeautifulSoup(res.text, "html.parser")
-    rows = len(soup.find_all("tr", class_="rigaPari")) + \
-        len(soup.find_all("tr", class_="rigaDispari"))
-    print(f"Offers found in curricular listing: {rows}")
+    urls = parser.extract_extracurricular_offer_links(res.content, EXTRACURRICULAR_BASE_URL)
+    pages = sc.fetch_all_extracurricular_offer_pages(urls)
+
+    offers = []
+    for url, page in zip(urls, pages):
+            offers.append(
+                parser.extract_curricular_offer(page.text, url))
+    write(offers, "data/curricular_internship_log.json", "")
 
 
 def main(config) -> None:
