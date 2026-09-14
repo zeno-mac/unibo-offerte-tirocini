@@ -15,6 +15,7 @@ from config import load_config
 
 BASE__URL = "https://tirocini.unibo.it/tirocini/studenti/"
 
+
 def setup_payload() -> dict:
     """Input: None. Output: dict of search-form fields sent as the POST body
     of the listing request (province, activity sector, keyword, ...)."""
@@ -43,20 +44,24 @@ def start_extracurricular_offers_scrape(cookies, payload, config):
     parses each company page, then writes the results to the path
     configured under config["extracurricular_internship"]."""
     sc = scraper.Scraper(cookies=cookies, payload=payload, headers={})
-    pages = sc.fetch_all_listing_pages()
-    companies = []
+    pages = sc.fetch_all_extracurricular_listing_pages()
+
     print("Extracting companies urls...")
+    offer_urls = []
     for page in pages:
-        companies += parser.extract_companies(page.text, BASE__URL)
+        offer_urls += parser.extract_extracurricular_offer_links(
+            page.text, BASE__URL)
 
-    companies_info = []
+    offer_info = []
     print("Fetching and extracting companies pages...")
-    company_pages = sc.fetch_all_offers_pages(companies)
-    for offer_info, page in zip(companies, company_pages):
-        companies_info.append(parser.extract_company_info(page.text, offer_info))
+    company_pages = sc.fetch_all_extracurricular_offer_pages(offer_urls)
+    for url, page in zip(offer_urls, company_pages):
+        offer_info.append(
+            parser.extract_extracurricular_offer(page.text, url))
 
-    print(f"Numero di offerte :{len(companies_info)}")
-    write(companies_info, config["extracurricular_internship"]["file_path"], config["extracurricular_internship"]["sorting_key"])
+    print(f"Numero di offerte :{len(offer_info)}")
+    write(offer_info, config["extracurricular_internship"]
+          ["file_path"], config["extracurricular_internship"]["sorting_key"])
 
 
 def main(config) -> None:
@@ -70,7 +75,8 @@ def main(config) -> None:
     cookies = setup_cookies()
     print("Fetching listing pages...")
 
-    start_extracurricular_offers_scrape(cookies=cookies, payload=payload, config=config)
+    start_extracurricular_offers_scrape(
+        cookies=cookies, payload=payload, config=config)
 
 
 if __name__ == "__main__":

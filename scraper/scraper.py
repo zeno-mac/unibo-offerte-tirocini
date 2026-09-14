@@ -32,21 +32,22 @@ class Scraper():
     cookies = {}
     headers = {}
     payload = {}
+
     def __init__(self, cookies, headers, payload):
         self.cookies = cookies
         self.headers = headers
         self.payload = payload
 
-    def fetch_all_offers_pages(self, urls):
+    def fetch_all_extracurricular_offer_pages(self, urls):
         offer_pages = []
         with Counter("Offer pages loaded", 1, len(urls)) as counter:
-                for company in urls:
-                    counter()
-                    page = self.fetch_company_page(url=company)
-                    offer_pages.append(page)
+            for company in urls:
+                counter()
+                page = self.fetch_extracurricular_offer(url=company)
+                offer_pages.append(page)
         return offer_pages
-                  
-    def fetch_listing_page(self, page_num: int = 1) -> requests.Response:
+
+    def fetch_extracurricular_listing_page(self, page_num: int = 1) -> requests.Response:
         """Input: page_num (int, 1-based). Uses self.cookies and self.payload.
         Output: requests.Response for that listing page.
         Retries up to MAX_RETRIES on HTTP/network errors or a wrong page
@@ -64,11 +65,11 @@ class Scraper():
             except requests.exceptions.HTTPError as e:
                 print(
                     f"\n[WARNING] HTTP Error during fetching of {LISTING_URL+"?page="+str(page_num)}, error: {e}, headers: {res.headers}")
-    
+
             except requests.exceptions.RequestException as e:
                 print(
                     f"\n[WARNING] Error during fetching of {LISTING_URL+"?page="+str(page_num)}, error: {e}")
-    
+
             except WrongPageError as e:
                 print("\n[WARNING] " + str(e))
                 print("Retrying...")
@@ -76,8 +77,7 @@ class Scraper():
             sleep(0.5)
         raise MaxRetriesReached(LISTING_URL+"?page="+str(page_num))
 
-    
-    def fetch_company_page(self, url: str) -> requests.Response:
+    def fetch_extracurricular_offer(self, url: str) -> requests.Response:
         """Input: url (str) of a company page. Uses self.cookies.
         Output: requests.Response for that page.
         Retries up to MAX_RETRIES on HTTP/network errors; raises
@@ -96,12 +96,12 @@ class Scraper():
             sleep(0.5)
         raise MaxRetriesReached(url)
 
-    def fetch_all_listing_pages(self, max_pages = None) -> list[requests.Response]:
+    def fetch_all_extracurricular_listing_pages(self, max_pages=None) -> list[requests.Response]:
         """Input: max_pages (int). Fetches listing pages 1..max_pages in order.
         Output: list of requests.Response, one per page. Propagates
-        MaxRetriesReached / SessionValidityError from fetch_listing_page."""
+        MaxRetriesReached / SessionValidityError from fetch_extracurricular_listing_page."""
         pages = []
-        p = self.fetch_listing_page(1)
+        p = self.fetch_extracurricular_listing_page(1)
         pages.append(p)
         if max_pages is None:
             max_pages = extract_max_pages(p.content)
@@ -109,9 +109,10 @@ class Scraper():
             counter()
             for i in range(2, max_pages+1):
                 counter()
-                page = self.fetch_listing_page(i)
+                page = self.fetch_extracurricular_listing_page(i)
                 pages.append(page)
         return pages
+
 
 def check_correct_page(data, page_num):
     """Input: data (requests.Response), page_num (int). Output: None.
@@ -119,6 +120,7 @@ def check_correct_page(data, page_num):
     (the site silently falls back to page 1 for out-of-range requests)."""
     if f"Pagina {page_num}/" not in data.text:
         raise WrongPageError(page_num)
+
 
 def check_session(res: requests.Response) -> requests.Response:
     """Input: res (requests.Response). Output: the same response if the session
@@ -130,8 +132,3 @@ def check_session(res: requests.Response) -> requests.Response:
             "JSESSIONID is expired, please update .env"
         )
     return res
-
-
-
-
-
