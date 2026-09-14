@@ -19,7 +19,7 @@ def extract_companies(page: bytes, base_url: str) -> list[dict]:
         raise IncorrectHTMLlayout("table class=iceDataTblOutline")
     rows += table.find_all('tr', class_="rigaPari")
     rows += table.find_all('tr', class_="rigaDispari")
-    return [{"name": row.td.a.p.get_text(strip=True), "url": re.sub(r"page=\d+&", "", base_url+row.td.a["href"])} for row in rows]
+    return [re.sub(r"page=\d+&", "", base_url+row.td.a["href"]) for row in rows]
 
 
 def extract_company_info(page: bytes, url: str) -> dict:

@@ -9,7 +9,6 @@ from writer import write
 from file_checker import check_differences, log_differences
 import scraper
 import parser
-from time import sleep
 from login import login
 from config import load_config
 
@@ -52,12 +51,9 @@ def start_extracurricular_offers_scrape(cookies, payload, config):
 
     companies_info = []
     print("Fetching and extracting companies pages...")
-    with Counter("Offer pages loaded", 1, len(companies)) as counter:
-        for company in companies:
-            counter()
-            page = sc.fetch_company_page(url=company["url"])
-            companies_info.append(parser.extract_company_info(
-                page.text, company["url"]))
+    company_pages = sc.fetch_all_offers_pages(companies)
+    for offer_info, page in zip(companies, company_pages):
+        companies_info.append(parser.extract_company_info(page.text, offer_info))
 
     print(f"Numero di offerte :{len(companies_info)}")
     write(companies_info, config["extracurricular_internship"]["file_path"], config["extracurricular_internship"]["sorting_key"])

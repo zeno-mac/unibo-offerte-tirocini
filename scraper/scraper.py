@@ -37,6 +37,15 @@ class Scraper():
         self.headers = headers
         self.payload = payload
 
+    def fetch_all_offers_pages(self, urls):
+        offer_pages = []
+        with Counter("Offer pages loaded", 1, len(urls)) as counter:
+                for company in urls:
+                    counter()
+                    page = self.fetch_company_page(url=company)
+                    offer_pages.append(page)
+        return offer_pages
+                  
     def fetch_listing_page(self, page_num: int = 1) -> requests.Response:
         """Input: page_num (int, 1-based). Uses self.cookies and self.payload.
         Output: requests.Response for that listing page.
