@@ -75,8 +75,8 @@ def start_extracurricular_offers_scrape(cookies, payload, config):
             parser.extract_extracurricular_offer(page.text, url))
 
     print(f"Numero di offerte :{len(offer_info)}")
-    write(offer_info, config["extracurricular_internship"]
-          ["file_path"], config["extracurricular_internship"]["sorting_key"])
+    extracurr_config = config["extracurricular_internship"]
+    write(offer_info, extracurr_config["file_path"], extracurr_config["sorting_key"])
 
 
 def start_extracurricular_offers_scrape(sc, config):
@@ -109,7 +109,7 @@ def start_extracurricular_offers_scrape(sc, config):
           ["file_path"], config["extracurricular_internship"]["sorting_key"])
 
 
-def start_curricular_offers_scrape(sc):
+def start_curricular_offers_scrape(sc, config):
     res = sc.fetch_curricular_listing_page()
     urls = parser.extract_extracurricular_offer_links(res.content, EXTRACURRICULAR_BASE_URL)
     pages = sc.fetch_all_extracurricular_offer_pages(urls)
@@ -118,7 +118,8 @@ def start_curricular_offers_scrape(sc):
     for url, page in zip(urls, pages):
             offers.append(
                 parser.extract_extracurricular_offer(page.text, url))
-    write(offers, "data/curricular_internship_log.json", "")
+    curr_config = config["curricular_internship"]
+    write(offers, curr_config["file_path"], curr_config["sorting_keys"])
 
 
 def main(config) -> None:
@@ -137,7 +138,7 @@ def main(config) -> None:
 
     start_extracurricular_offers_scrape(sc, config=config)
 
-    start_curricular_offers_scrape(sc)
+    start_curricular_offers_scrape(sc, config)
 
 
 if __name__ == "__main__":

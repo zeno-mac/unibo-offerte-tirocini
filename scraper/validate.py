@@ -20,3 +20,4 @@ def validate(file, keys):
 if __name__ == "__main__":
     config =load_config()
     validate(config["extracurricular_internship"]["file_path"], config["extracurricular_internship"]["keys"])
+    validate(config["curricular_internship"]["file_path"], config["curricular_internship"]["keys"])
