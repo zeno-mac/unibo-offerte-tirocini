@@ -1,0 +1,16 @@
+[
+    {
+        "file_path": "data/first_cycle_curricular_internship_log.json",
+        "type": "curricular_internship",
+        "payload": {
+            "denominazioneAzienda": "",
+            "cerca": "Search",
+            "_soloOfferteConAllegatoTpv": "on",
+            "tipoCiclo": "ALL",
+            "facolta": "ALL",
+            "corso": "",
+            "form_submit": "true"
+        },
+        "max_pages" : 1
+    }
+]
