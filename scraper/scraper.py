@@ -4,12 +4,7 @@ from counter import Counter
 from time import sleep
 from parser import extract_max_pages
 
-MAX_RETRIES = 5
-
-BASE__URL = "https://tirocini.unibo.it/tirocini/studenti/"
-EXTRACURRICULAR_URL = BASE__URL + "gestioneaziendeconautocandidature.htm"
-CURRICULAR_URL = BASE__URL + "gestioneoffertetirocinio.htm"
-
+MAX_RETRIES = 10
 
 class SessionValidityError(Exception):
     def __init__(self, msg="JSESSIONID is expired, please update .env"):

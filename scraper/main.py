@@ -38,7 +38,7 @@ def run_step(step, config):
     print("Extracting companies urls...")
     offer_urls = []
     for page in pages:
-        offer_urls += parser.extract_extracurricular_offer_links(
+        offer_urls += parser.extract_offer_urls(
             page.text, BASE_URL)
 
     offer_info = []
@@ -47,11 +47,10 @@ def run_step(step, config):
 
     for url, page in zip(offer_urls, company_pages):
         offer_info.append(
-            parser.extract_extracurricular_offer(page.text, url))
+            parser.extract_offer_info(page.text, url))
 
     print(f"Numero di offerte :{len(offer_info)}")
-    write(offer_info, config[step["type"]]
-          ["file_path"], config[step["type"]]["sorting_key"])
+    write(offer_info, step["file_path"], config[step["type"]]["sorting_key"])
 
 
 def main(config):

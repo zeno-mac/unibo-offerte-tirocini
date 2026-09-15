@@ -7,7 +7,7 @@ class IncorrectHTMLlayout(Exception):
         super().__init__(f"Error during html parsing: {target}")
 
 
-def extract_extracurricular_offer_links(page: bytes, base_url: str) -> list[str]:
+def extract_offer_urls(page: bytes, base_url: str) -> list[str]:
     """Input: page (bytes/str, HTML of a listing page), base_url (str).
     Output: list of url : str, one per company row, with
     the 'page=N&' query param stripped from each URL.
@@ -22,7 +22,7 @@ def extract_extracurricular_offer_links(page: bytes, base_url: str) -> list[str]
     return [re.sub(r"page=\d+&", "", base_url+row.td.a["href"]) for row in rows]
 
 
-def extract_extracurricular_offer(page: bytes, url: str) -> dict:
+def extract_offer_info(page: bytes, url: str) -> dict:
     """Input: page (bytes/str, HTML of a company page), url (str).
     Output: dict {field label: value} scraped from the detail table, plus
     "Indirizzo dell'offerta:" set to url.
