@@ -5,7 +5,8 @@
             "Indirizzo dell'offerta:",
             "Ragione Sociale:"
         ],
-        "sorting_key": "Ragione Sociale:"
+        "sorting_key": "Ragione Sociale:",
+        "base_url" : "https://tirocini.unibo.it/tirocini/studenti/gestioneaziendeconautocandidature.htm?"
     },
     "curricular_internship": {
         "file_path": "data/curricular_internship_log.json",
@@ -13,6 +14,7 @@
             "Indirizzo dell'offerta:",
             "Azienda/Ente:"
         ],
-        "sorting_key": "Azienda/Ente:"
+        "sorting_key": "Azienda/Ente:",
+        "base_url" : "https://tirocini.unibo.it/tirocini/studenti/gestioneoffertetirocinio.htm?idTipoTirocinio=2&idCarriera=1"
     }
 }
