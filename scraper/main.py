@@ -119,7 +119,7 @@ def start_curricular_offers_scrape(sc, config):
             offers.append(
                 parser.extract_extracurricular_offer(page.text, url))
     curr_config = config["curricular_internship"]
-    write(offers, curr_config["file_path"], curr_config["sorting_keys"])
+    write(offers, curr_config["file_path"], curr_config["sorting_key"])
 
 
 def main(config) -> None:
@@ -136,7 +136,7 @@ def main(config) -> None:
     sc = scraper.Scraper(cookies=cookies, curricular_payload=curr_payload,
                          extracurricular_payload=extracurr_payload, headers={})
 
-    start_extracurricular_offers_scrape(sc, config=config)
+    #start_extracurricular_offers_scrape(sc, config=config)
 
     start_curricular_offers_scrape(sc, config)
 
