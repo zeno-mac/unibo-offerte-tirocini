@@ -30,10 +30,14 @@ def setup_cookies() -> dict:
 def run_step(step, config):
     payload = step["payload"]
     cookies = setup_cookies()
-
+    curr_config = config[step["type"]]
+    try:
+        max_pages = step["max_pages"]
+    except KeyError:
+        max_pages = None
     sc = Scraper(cookies=cookies, payload=payload,
-                 base_url=config[step["type"]]["base_url"], headers={})
-    pages = sc.fetch_all_listing_pages(max_pages=step["max_pages"])
+                 base_url=curr_config["base_url"], headers={})
+    pages = sc.fetch_all_listing_pages(max_pages)
 
     print("Extracting companies urls...")
     offer_urls = []
@@ -50,7 +54,7 @@ def run_step(step, config):
             parser.extract_offer_info(page.text, url))
 
     print(f"Numero di offerte :{len(offer_info)}")
-    write(offer_info, step["file_path"], config[step["type"]]["sorting_key"])
+    write(offer_info, step["file_path"], curr_config["sorting_key"])
 
 
 def main(config):
