@@ -54,6 +54,50 @@ function section(title, innerHtml) {
     return innerHtml ? `<div class="card-section"><h4>${esc(title)}</h4>${innerHtml}</div>` : "";
 }
 
+const MAX_TEXT_LENGTH = 300;
+
+function expandableProse(text, className = "prose", maxLen = MAX_TEXT_LENGTH) {
+    if (!text) return "";
+    if (text.length <= maxLen) return `<p class="${className}">${esc(text)}</p>`;
+    
+    const short = text.slice(0, maxLen).trim() + "…";
+    return `<div class="expandable">
+        <div class="summary"><p class="${className}">${esc(short)}</p></div>
+        <div class="full" hidden><p class="${className}">${esc(text)}</p></div>
+        <button type="button" class="show-more-btn link-btn">Mostra altro</button>
+    </div>`;
+}
+
+function expandableProseParts(parts, maxLen = MAX_TEXT_LENGTH) {
+    const valid = parts.filter(p => p.text);
+    if (!valid.length) return "";
+    
+    const totalLen = valid.reduce((acc, p) => acc + p.text.length, 0);
+    const fullHtml = valid.map(p => `<p class="${p.className}">${esc(p.text)}</p>`).join("");
+    
+    if (totalLen <= maxLen) return fullHtml;
+    
+    let summaryHtml = "";
+    let len = 0;
+    for (const p of valid) {
+        if (len >= maxLen) break;
+        const rem = maxLen - len;
+        if (p.text.length <= rem) {
+            summaryHtml += `<p class="${p.className}">${esc(p.text)}</p>`;
+            len += p.text.length;
+        } else {
+            summaryHtml += `<p class="${p.className}">${esc(p.text.slice(0, rem).trim())}…</p>`;
+            break;
+        }
+    }
+    
+    return `<div class="expandable">
+        <div class="summary">${summaryHtml}</div>
+        <div class="full" hidden>${fullHtml}</div>
+        <button type="button" class="show-more-btn link-btn">Mostra altro</button>
+    </div>`;
+}
+
 // Field labels scraped from the site sometimes carry embedded newlines/extra
 // spaces (an artifact of the source HTML markup). Look records up by a
 // whitespace-normalized version of the label so both shapes match.
@@ -155,8 +199,8 @@ function cardHTMLExtra(o) {
         <h3 class="card-title">${esc(o.company)}</h3>
         <div class="badges">${badges}</div>
         ${actions ? `<div class="actions">${actions}</div>` : ""}
-        ${section("Descrizione", o.description && `<p class="prose">${esc(o.description)}</p>`)}
-        ${section("Note sul tirocinio", o.note && `<p class="prose">${esc(o.note)}</p>`)}
+        ${section("Descrizione", expandableProse(o.description))}
+        ${section("Note sul tirocinio", expandableProse(o.note))}
         ${section("Contatti", contactRows && `<dl class="info">${contactRows}</dl>`)}
         ${section("Settori di attività", o.sectors && `<p class="prose dim">${esc(o.sectors)}</p>`)}
     </article>`;
@@ -274,11 +318,12 @@ function cardHTMLCurricular(o) {
         addr && `<a class="action" href="https://www.google.com/maps/search/?api=1&query=${mapsQuery}" target="_blank" rel="noopener">Mappa ↗</a>`,
     ].filter(Boolean).join("");
 
-    const descriptionParts = [
-        o.oggetto && `<p class="prose">${esc(o.oggetto)}</p>`,
-        o.obiettivi && `<p class="prose dim">${esc(o.obiettivi)}</p>`,
-        o.attivita && `<p class="prose dim">${esc(o.attivita)}</p>`,
-    ].filter(Boolean).join("");
+    const descriptionPartsData = [
+        { text: o.oggetto, className: "prose" },
+        { text: o.obiettivi, className: "prose dim" },
+        { text: o.attivita, className: "prose dim" },
+    ];
+    const descriptionHtml = expandableProseParts(descriptionPartsData);
 
     const requisiti = [
         infoRow("Conoscenze/abilità", o.conoscenze && esc(o.conoscenze)),
@@ -308,8 +353,8 @@ function cardHTMLCurricular(o) {
         <h3 class="card-title">${esc(o.company)}</h3>
         <div class="badges">${badges}</div>
         ${actions ? `<div class="actions">${actions}</div>` : ""}
-        ${section("Descrizione", descriptionParts)}
-        ${section("Note sul tirocinio", o.note && `<p class="prose">${esc(o.note)}</p>`)}
+        ${section("Descrizione", descriptionHtml)}
+        ${section("Note sul tirocinio", expandableProse(o.note))}
         ${section("Requisiti", requisiti && `<dl class="info">${requisiti}</dl>`)}
         ${section("Dettagli tirocinio", dettagli && `<dl class="info">${dettagli}</dl>`)}
         ${section("Contatti", contactRows && `<dl class="info">${contactRows}</dl>`)}
@@ -523,6 +568,25 @@ function wireEvents() {
         if (!cb.matches("input[type=checkbox]")) return;
         currentState().other[cb.dataset.key] = cb.checked;
         applyFilters();
+    });
+
+    document.getElementById("card-grid").addEventListener("click", (e) => {
+        if (e.target.matches(".show-more-btn")) {
+            const btn = e.target;
+            const expandable = btn.closest(".expandable");
+            const summary = expandable.querySelector(".summary");
+            const full = expandable.querySelector(".full");
+            
+            if (full.hidden) {
+                full.hidden = false;
+                summary.hidden = true;
+                btn.textContent = "Mostra meno";
+            } else {
+                full.hidden = true;
+                summary.hidden = false;
+                btn.textContent = "Mostra altro";
+            }
+        }
     });
 
     document.getElementById("clear-filters").addEventListener("click", () => {
