@@ -171,6 +171,7 @@ function normalizeExtra(rec, idx) {
     const first = fixText(r[EXTRA_FIELDS.refFirst]);
     const last = fixText(r[EXTRA_FIELDS.refLast]);
     const o = {
+        _raw: rec,
         idx,
         id: offerId(url) || "e" + idx,
         url,
@@ -292,6 +293,7 @@ function normalizeCurricular(rec, idx) {
     const indennita = fixText(r[CURR_FIELDS.indennita]);
     const corsiRaw = fixText(r[CURR_FIELDS.corsi]);
     const o = {
+        _raw: rec,
         idx,
         id: offerId(url) || "c" + idx,
         url,
@@ -638,6 +640,20 @@ function wireEvents() {
         state.activeType = btn.dataset.type;
         refreshTypeUI();
         document.body.classList.remove("filters-open");
+    });
+
+    document.getElementById("download-json").addEventListener("click", () => {
+        const s = currentState();
+        const data = s.filtered.map(o => o._raw);
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `offerte-${state.activeType}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
     });
 
     document.getElementById("toggle-filters").addEventListener("click", () => {
