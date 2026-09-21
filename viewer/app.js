@@ -12,6 +12,26 @@ function esc(s) {
     }[c]));
 }
 
+function escHl(text) {
+    if (text == null) return "";
+    const str = String(text);
+    const s = typeof state !== "undefined" && state.activeType ? currentState() : null;
+    const tokens = s && s.search ? s.search.toLowerCase().split(/\s+/).filter(Boolean) : [];
+    
+    if (!tokens.length) return esc(str);
+    
+    const escapedTokens = tokens.map(t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+    const re = new RegExp(`(${escapedTokens.join('|')})`, 'gi');
+    
+    const parts = str.split(re);
+    return parts.map((part, i) => {
+        if (i % 2 === 1) {
+            return `<mark>${esc(part)}</mark>`;
+        }
+        return esc(part);
+    }).join("");
+}
+
 // Some records in the source come double/triple mis-encoded (UTF-8 read as
 // Latin-1). Re-decode a few times, but only when tell-tale sequences appear so
 // correctly encoded accents are left untouched.
@@ -58,13 +78,20 @@ const MAX_TEXT_LENGTH = 300;
 
 function expandableProse(text, className = "prose", maxLen = MAX_TEXT_LENGTH) {
     if (!text) return "";
-    if (text.length <= maxLen) return `<p class="${className}">${esc(text)}</p>`;
+    
+    const s = typeof state !== "undefined" && state.activeType ? currentState() : null;
+    const tokens = s && s.search ? s.search.toLowerCase().split(/\s+/).filter(Boolean) : [];
+    const hasMatch = tokens.length > 0 && tokens.some(t => text.toLowerCase().includes(t));
+
+    if (text.length <= maxLen) return `<p class="${className}">${escHl(text)}</p>`;
     
     const short = text.slice(0, maxLen).trim() + "…";
+    const isExpanded = hasMatch;
+
     return `<div class="expandable">
-        <div class="summary"><p class="${className}">${esc(short)}</p></div>
-        <div class="full" hidden><p class="${className}">${esc(text)}</p></div>
-        <button type="button" class="show-more-btn link-btn">Mostra altro</button>
+        <div class="summary" ${isExpanded ? 'hidden' : ''}><p class="${className}">${escHl(short)}</p></div>
+        <div class="full" ${isExpanded ? '' : 'hidden'}><p class="${className}">${escHl(text)}</p></div>
+        <button type="button" class="show-more-btn link-btn">${isExpanded ? 'Mostra meno' : 'Mostra altro'}</button>
     </div>`;
 }
 
@@ -72,8 +99,12 @@ function expandableProseParts(parts, maxLen = MAX_TEXT_LENGTH) {
     const valid = parts.filter(p => p.text);
     if (!valid.length) return "";
     
+    const s = typeof state !== "undefined" && state.activeType ? currentState() : null;
+    const tokens = s && s.search ? s.search.toLowerCase().split(/\s+/).filter(Boolean) : [];
+    const hasMatch = tokens.length > 0 && valid.some(p => tokens.some(t => p.text.toLowerCase().includes(t)));
+
     const totalLen = valid.reduce((acc, p) => acc + p.text.length, 0);
-    const fullHtml = valid.map(p => `<p class="${p.className}">${esc(p.text)}</p>`).join("");
+    const fullHtml = valid.map(p => `<p class="${p.className}">${escHl(p.text)}</p>`).join("");
     
     if (totalLen <= maxLen) return fullHtml;
     
@@ -83,18 +114,20 @@ function expandableProseParts(parts, maxLen = MAX_TEXT_LENGTH) {
         if (len >= maxLen) break;
         const rem = maxLen - len;
         if (p.text.length <= rem) {
-            summaryHtml += `<p class="${p.className}">${esc(p.text)}</p>`;
+            summaryHtml += `<p class="${p.className}">${escHl(p.text)}</p>`;
             len += p.text.length;
         } else {
-            summaryHtml += `<p class="${p.className}">${esc(p.text.slice(0, rem).trim())}…</p>`;
+            summaryHtml += `<p class="${p.className}">${escHl(p.text.slice(0, rem).trim() + "…")}</p>`;
             break;
         }
     }
     
+    const isExpanded = hasMatch;
+
     return `<div class="expandable">
-        <div class="summary">${summaryHtml}</div>
-        <div class="full" hidden>${fullHtml}</div>
-        <button type="button" class="show-more-btn link-btn">Mostra altro</button>
+        <div class="summary" ${isExpanded ? 'hidden' : ''}>${summaryHtml}</div>
+        <div class="full" ${isExpanded ? '' : 'hidden'}>${fullHtml}</div>
+        <button type="button" class="show-more-btn link-btn">${isExpanded ? 'Mostra meno' : 'Mostra altro'}</button>
     </div>`;
 }
 
@@ -168,7 +201,7 @@ function normalizeExtra(rec, idx) {
 function cardHTMLExtra(o) {
     const badges = [o.type, o.comune]
         .filter(Boolean)
-        .map((b) => `<span class="badge">${esc(b)}</span>`)
+        .map((b) => `<span class="badge">${escHl(b)}</span>`)
         .join("");
 
     const addr = [
@@ -188,21 +221,21 @@ function cardHTMLExtra(o) {
     ].filter(Boolean).join("");
 
     const contactRows = [
-        infoRow("Referente", o.referent && esc(o.referent)),
-        infoRow("Telefono", o.phone && `<a href="tel:${esc(o.phone.replace(/\s+/g, ""))}">${esc(o.phone)}</a>`),
-        infoRow("Email", o.email && `<a href="mailto:${esc(o.email)}">${esc(o.email)}</a>`),
-        infoRow("Sito web", o.web && `<a href="${esc(webHref(o.web))}" target="_blank" rel="noopener">${esc(o.web)}</a>`),
-        infoRow("Indirizzo", addr && esc(addr)),
+        infoRow("Referente", o.referent && escHl(o.referent)),
+        infoRow("Telefono", o.phone && `<a href="tel:${esc(o.phone.replace(/\s+/g, ""))}">${escHl(o.phone)}</a>`),
+        infoRow("Email", o.email && `<a href="mailto:${esc(o.email)}">${escHl(o.email)}</a>`),
+        infoRow("Sito web", o.web && `<a href="${esc(webHref(o.web))}" target="_blank" rel="noopener">${escHl(o.web)}</a>`),
+        infoRow("Indirizzo", addr && escHl(addr)),
     ].join("");
 
     return `<article class="card" id="offer-${esc(o.id)}">
-        <h3 class="card-title">${esc(o.company)}</h3>
+        <h3 class="card-title">${escHl(o.company)}</h3>
         <div class="badges">${badges}</div>
         ${actions ? `<div class="actions">${actions}</div>` : ""}
         ${section("Descrizione", expandableProse(o.description))}
         ${section("Note sul tirocinio", expandableProse(o.note))}
         ${section("Contatti", contactRows && `<dl class="info">${contactRows}</dl>`)}
-        ${section("Settori di attività", o.sectors && `<p class="prose dim">${esc(o.sectors)}</p>`)}
+        ${section("Settori di attività", o.sectors && `<p class="prose dim">${escHl(o.sectors)}</p>`)}
     </article>`;
 }
 
@@ -301,7 +334,7 @@ function normalizeCurricular(rec, idx) {
 function cardHTMLCurricular(o) {
     const badges = [...o.cycles, o.tipoTirocinio, o.comune]
         .filter(Boolean)
-        .map((b) => `<span class="badge">${esc(b)}</span>`)
+        .map((b) => `<span class="badge">${escHl(b)}</span>`)
         .join("");
 
     const addr = [
@@ -326,31 +359,31 @@ function cardHTMLCurricular(o) {
     const descriptionHtml = expandableProseParts(descriptionPartsData);
 
     const requisiti = [
-        infoRow("Conoscenze/abilità", o.conoscenze && esc(o.conoscenze)),
-        infoRow("Lingue richieste", o.linguistiche && esc(o.linguistiche)),
-        infoRow("Informatica richiesta", o.informatiche && esc(o.informatiche)),
+        infoRow("Conoscenze/abilità", o.conoscenze && escHl(o.conoscenze)),
+        infoRow("Lingue richieste", o.linguistiche && escHl(o.linguistiche)),
+        infoRow("Informatica richiesta", o.informatiche && escHl(o.informatiche)),
     ].join("");
 
     const dettagli = [
-        infoRow("Durata", o.durata && esc(o.durata)),
-        infoRow("Tirocinanti", o.numTirocinanti && esc(o.numTirocinanti)),
-        infoRow("Inizio previsto", o.dataInizio && esc(o.dataInizio)),
-        infoRow("Fine prevista", o.dataFine && esc(o.dataFine)),
-        infoRow("Indennità/borsa", o.indennita && esc(o.indennita)),
-        infoRow("Scadenza domanda", o.dataScadenza && esc(o.dataScadenza)),
-        infoRow("Struttura", o.struttura && esc(o.struttura)),
+        infoRow("Durata", o.durata && escHl(o.durata)),
+        infoRow("Tirocinanti", o.numTirocinanti && escHl(o.numTirocinanti)),
+        infoRow("Inizio previsto", o.dataInizio && escHl(o.dataInizio)),
+        infoRow("Fine prevista", o.dataFine && escHl(o.dataFine)),
+        infoRow("Indennità/borsa", o.indennita && escHl(o.indennita)),
+        infoRow("Scadenza domanda", o.dataScadenza && escHl(o.dataScadenza)),
+        infoRow("Struttura", o.struttura && escHl(o.struttura)),
     ].join("");
 
     const contactRows = [
-        infoRow("Tutor", o.tutor && esc(o.tutor)),
-        infoRow("Ruolo tutor", o.tutorRuolo && esc(o.tutorRuolo)),
-        infoRow("Indirizzo", addr && esc(addr)),
+        infoRow("Tutor", o.tutor && escHl(o.tutor)),
+        infoRow("Ruolo tutor", o.tutorRuolo && escHl(o.tutorRuolo)),
+        infoRow("Indirizzo", addr && escHl(addr)),
     ].join("");
 
-    const corsiBadges = o.corsi.map((c) => `<span class="badge">${esc(c)}</span>`).join("");
+    const corsiBadges = o.corsi.map((c) => `<span class="badge">${escHl(c)}</span>`).join("");
 
     return `<article class="card" id="offer-${esc(o.id)}">
-        <h3 class="card-title">${esc(o.company)}</h3>
+        <h3 class="card-title">${escHl(o.company)}</h3>
         <div class="badges">${badges}</div>
         ${actions ? `<div class="actions">${actions}</div>` : ""}
         ${section("Descrizione", descriptionHtml)}

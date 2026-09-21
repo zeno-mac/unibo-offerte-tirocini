@@ -45,6 +45,14 @@ a:hover { text-decoration: underline; }
 
 button { font-family: inherit; cursor: pointer; }
 
+mark {
+    background: var(--accent-weak);
+    color: var(--accent);
+    border-radius: 3px;
+    padding: 0 2px;
+    margin: 0 -2px;
+}
+
 ::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-thumb { background: #2b323e; border-radius: 6px; border: 2px solid var(--bg); }
 ::-webkit-scrollbar-thumb:hover { background: #3a4351; }
