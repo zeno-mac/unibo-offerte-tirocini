@@ -7,7 +7,7 @@ class IncorrectHTMLlayout(Exception):
         super().__init__(f"Error during html parsing: {target}")
 
 
-def extract_extracurricular_offer_links(page: bytes, base_url: str) -> list[str]:
+def extract_offer_urls(page: bytes, base_url: str) -> list[str]:
     """Input: page (bytes/str, HTML of a listing page), base_url (str).
     Output: list of url : str, one per company row, with
     the 'page=N&' query param stripped from each URL.
@@ -22,13 +22,13 @@ def extract_extracurricular_offer_links(page: bytes, base_url: str) -> list[str]
     return [re.sub(r"page=\d+&", "", base_url+row.td.a["href"]) for row in rows]
 
 
-def extract_extracurricular_offer(page: bytes, url: str) -> dict:
+def extract_offer_info(page: bytes, url: str) -> dict:
     """Input: page (bytes/str, HTML of a company page), url (str).
     Output: dict {field label: value} scraped from the detail table, plus
     "Indirizzo dell'offerta:" set to url.
     Raises IncorrectHTMLlayout if the detail table is missing."""
     soup = BeautifulSoup(page, "html.parser")
-    table = soup.find("table", class_="tbSimpleData")
+    table = soup.find("table", class_="tbSimpleData", summary="Tabella di struttura")
     dict = {
         "Indirizzo dell'offerta:": url
     }
@@ -50,9 +50,10 @@ def extract_max_pages(page):
     soup = BeautifulSoup(page, "html.parser")
     td = soup.find("td", class_="icePnlGrdColumn2")
     if td is None:
-        raise IncorrectHTMLlayout("td class=icePnlGrdColumn2")
+        print("[WARNING] No max_page found, defaulting to 1...")
+        return 1
     match = re.search(r"Pagina\s+\d+/(\d+)", td.get_text())
     if match is None:
-        raise IncorrectHTMLlayout(
-            "'Pagina X/Y' text in td class=icePnlGrdColumn2")
+        print("[WARNING] No max_page found, defaulting to 1...")
+        return 1
     return int(match.group(1))

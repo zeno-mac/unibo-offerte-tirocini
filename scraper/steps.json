@@ -1,0 +1,29 @@
+[
+    {
+        "file_path": "data/extracurricular_internship_log.json",
+        "type": "extracurricular_internship",
+        "payload": {
+            "denominazioneAzienda": "",
+            "provincia": "351",
+            "parolaChiave": "",
+            "nazione": "",
+            "settoreAttivita": "35",
+            "_flagConvenzioneTPVPsicologia": "on",
+            "cerca": "Search",
+            "form_submit": "true"
+        }
+    },
+    {
+        "file_path": "data/curricular_internship_log.json",
+        "type": "curricular_internship",
+        "payload": {
+            "denominazioneAzienda": "",
+            "cerca": "Search",
+            "_soloOfferteConAllegatoTpv": "on",
+            "tipoCiclo": "1",
+            "facolta": "AMB9",
+            "corso": "33",
+            "form_submit": "true"
+        }
+    }
+]

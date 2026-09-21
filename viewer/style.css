@@ -45,6 +45,14 @@ a:hover { text-decoration: underline; }
 
 button { font-family: inherit; cursor: pointer; }
 
+mark {
+    background: var(--accent-weak);
+    color: var(--accent);
+    border-radius: 3px;
+    padding: 0 2px;
+    margin: 0 -2px;
+}
+
 ::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-thumb { background: #2b323e; border-radius: 6px; border: 2px solid var(--bg); }
 ::-webkit-scrollbar-thumb:hover { background: #3a4351; }
@@ -96,6 +104,33 @@ button { font-family: inherit; cursor: pointer; }
 .search input::placeholder { color: var(--text-faint); }
 .search input:focus { border-color: var(--accent-border); background: var(--panel-3); }
 
+/* ---------- Type tabs ---------- */
+.type-tabs {
+    flex: none;
+    display: flex;
+    gap: 4px;
+    padding: 10px 18px 0;
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+}
+.type-tab {
+    appearance: none;
+    background: none;
+    border: none;
+    padding: 9px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-dim);
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+}
+.type-tab:hover { color: var(--text); }
+.type-tab.active {
+    color: var(--text);
+    border-bottom-color: var(--accent);
+    font-weight: 600;
+}
+
 /* ---------- Layout ---------- */
 .layout {
     flex: 1;
@@ -131,6 +166,11 @@ button { font-family: inherit; cursor: pointer; }
     letter-spacing: 0;
 }
 .link-btn:hover { text-decoration: underline; }
+
+.expandable .show-more-btn {
+    margin-top: 4px;
+    margin-left: -4px;
+}
 
 .filter-group { padding: 12px 16px; border-top: 1px solid var(--border-soft); }
 .filter-group h3 {
@@ -280,7 +320,7 @@ select:focus { border-color: var(--accent-border); }
     margin: 0;
     font-size: 12.5px;
 }
-.info dt { color: var(--text-faint); }
+.info dt { color: var(--text-faint); overflow-wrap: anywhere; }
 .info dd { margin: 0; color: var(--text); overflow-wrap: anywhere; }
 
 .notice {

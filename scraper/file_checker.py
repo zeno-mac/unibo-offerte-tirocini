@@ -51,17 +51,18 @@ def list_fields(data):
     return s
 
 
-def log_differences(data):
+def log_differences(name, data):
     """Input: data (dict | None) as returned by check_differences, with
     'len_diff', 'new_items' and 'lost_items'. Output: None; prints a
     human-readable summary to stdout and, via emit_output, writes a
     "summary" entry to $GITHUB_OUTPUT when running in CI. If data is None
     (no committed version to diff against) it just prints a no-op message."""
     if not data:
-        print("No difference in files since last commit")
+        print(f"No difference in {name} since last commit")
+        print("\n")
         return
     print(
-        f"Change in data: \n{"+" if data["len_diff"] > 0 else ""}{data["len_diff"]} total items")
+        f"Change in {name}: \n{"+" if data["len_diff"] > 0 else ""}{data["len_diff"]} total items")
     print(f"{(len(data["lost_items"]))} deleted items: ")
     print("")
     print(list_fields(data["lost_items"]))
@@ -69,13 +70,15 @@ def log_differences(data):
     print(f"{(len(data["new_items"]))} new items:")
     print("")
     print(list_fields(data["new_items"]))
+    print("\n")
 
     summary = (
+        f"Difference in {name}:"
         f"{"+" if data["len_diff"] > 0 else ""}{data["len_diff"]} total items\n"
         f"{len(data['new_items'])} new items:\n"
         f"{list_fields(data["new_items"])}"
         f"{len(data['lost_items'])} deleted items:\n"
-        f"{list_fields(data["lost_items"])}")
+        f"{list_fields(data["lost_items"])}\n\n")
     emit_output("summary", summary)
 
 
@@ -123,12 +126,15 @@ def main():
     config = load_config()
     try:
 
-        diffs = check_differences("", config["extracurricular_internship"]["file_path"],
+        extracurr_diffs = check_differences("", config["extracurricular_internship"]["file_path"],
                                   config["extracurricular_internship"]["keys"])
+        curr_diff = check_differences("", config["curricular_internship"]["file_path"],
+                                  config["curricular_internship"]["keys"])
     except json.JSONDecodeError as e:
         print(f"[ERROR] previous version is not valid JSON: {e}")
         sys.exit(1)
-    log_differences(diffs)
+    log_differences("Extracurricular internship offers", extracurr_diffs)
+    log_differences("Curricular internship offers", curr_diff)
 
 
 if __name__ == "__main__":
