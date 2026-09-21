@@ -50,7 +50,8 @@ def extract_max_pages(page):
     soup = BeautifulSoup(page, "html.parser")
     td = soup.find("td", class_="icePnlGrdColumn2")
     if td is None:
-        raise IncorrectHTMLlayout("td class=icePnlGrdColumn2")
+        print("[WARNING] No max_page found, defaulting to 1...")
+        return 1
     match = re.search(r"Pagina\s+\d+/(\d+)", td.get_text())
     if match is None:
         print("[WARNING] No max_page found, defaulting to 1...")
