@@ -28,7 +28,8 @@ def extract_offer_info(page: bytes, url: str) -> dict:
     "Indirizzo dell'offerta:" set to url.
     Raises IncorrectHTMLlayout if the detail table is missing."""
     soup = BeautifulSoup(page, "html.parser")
-    table = soup.find("table", class_="tbSimpleData", summary="Tabella di struttura")
+    table = soup.find("table", class_="tbSimpleData",
+                      summary="Tabella di struttura")
     dict = {
         "Indirizzo dell'offerta:": url
     }
@@ -38,8 +39,12 @@ def extract_offer_info(page: bytes, url: str) -> dict:
         name = row.find("td", class_="formLabelNew")
         value = row.find("td", class_="value")
         if name and value:
-            dict[name.get_text(strip=True)] = value.get_text(
-                separator=" ", strip=True)
+            # Needs to split "Corsi:" field in curricular internship in order to keep the json consistent
+            if name.get_text(strip=True) == "Corsi:":
+                val = extract_courses(value.get_text(separator=" ", strip=True))
+            else:
+                val = value.get_text(separator=" ", strip=True)
+            dict[name.get_text(strip=True)] = val
     return dict
 
 
@@ -57,3 +62,11 @@ def extract_max_pages(page):
         print("[WARNING] No max_page found, defaulting to 1...")
         return 1
     return int(match.group(1))
+
+
+def extract_courses(vals):
+    return sorted(
+        f"({course.strip()}"
+        for course in vals.split("(")
+        if course.strip()
+    )
