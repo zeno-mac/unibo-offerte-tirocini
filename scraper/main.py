@@ -27,9 +27,8 @@ def setup_cookies() -> dict:
     return {"JSESSIONID": id}
 
 
-def run_step(step, config):
+def run_step(step, config, cookies):
     payload = step["payload"]
-    cookies = setup_cookies()
     curr_config = config[step["type"]]
     try:
         max_pages = step["max_pages"]
@@ -63,8 +62,9 @@ def main(config):
         return
     with open(sys.argv[1], "r") as f:
         steps = json.load(f)
+    cookies = setup_cookies()
     for step in steps:
-        run_step(step, config)
+        run_step(step, config, cookies)
 
 
 if __name__ == "__main__":
