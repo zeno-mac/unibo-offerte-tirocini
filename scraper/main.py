@@ -41,8 +41,6 @@ def run_step(step, config, cookies):
     print("Extracting companies urls...")
     offer_urls = []
     for page in pages:
-        with open("test/curricular_listing.html", "w") as f:
-            f.write(page.text)
         offer_urls += parser.extract_offer_urls(
             page.text, BASE_URL)
 

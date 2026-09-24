@@ -70,24 +70,3 @@ def extract_courses(vals):
         for course in vals.split("(")
         if course.strip()
     )
-
-def extract_courses_codes(page):
-    soup = BeautifulSoup(page, "html.parser")
-    select = soup.find("select", id = "corso")
-    if select is None:
-        raise IncorrectHTMLlayout('select id="corso"')
-    codes = {}
-    for option in select.find_all("option"):
-        code = option['value']
-        name = option.get_text(separator=" ", strip=True).replace("\t", "").replace("\n", " ")
-        codes[code] = name
-    return codes
-
-def convert_course_name(name, codes):
-    # Example of a name:  "(34 ) INFORMATICA - Scienze"
-    match = re.search(r"\d+", name)
-    if match is None:
-        print(f"[WARNING] No number: '{name}'")
-        return name
-    return codes[str(match.group(0))]
-    
