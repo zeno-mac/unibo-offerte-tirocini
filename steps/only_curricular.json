@@ -1,0 +1,15 @@
+[
+    {
+        "file_path": "data/curricular_internship_log.json",
+        "type": "curricular_internship",
+        "payload": {
+            "denominazioneAzienda": "",
+            "cerca": "Search",
+            "_soloOfferteConAllegatoTpv": "on",
+            "tipoCiclo": "ALL",
+            "facolta": "AMB9",
+            "corso": "",
+            "form_submit": "true"
+        }
+    }
+]
