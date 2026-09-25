@@ -67,11 +67,12 @@ def extract_max_pages(page):
 
 
 def extract_courses(vals):
-    return sorted(
+    # Duplicate removal is needed because "INGEGNERIA INFORMATICA - Ingegneria e architettura" is always present with two codes 155 and 159
+    return sorted({
         convert_course_name(course.strip())
         for course in vals.split("(")
         if course.strip()
-    )
+    })
 
 
 def extract_courses_codes(page):
