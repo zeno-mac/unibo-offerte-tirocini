@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 import re
 import json
 
+
 class IncorrectHTMLlayout(Exception):
     def __init__(self, target):
         super().__init__(f"Error during html parsing: {target}")
@@ -41,7 +42,8 @@ def extract_offer_info(page: bytes, url: str) -> dict:
         if name and value:
             # Needs to split "Corsi:" field in curricular internship in order to keep the json consistent
             if name.get_text(strip=True) == "Corsi:":
-                val = extract_courses(value.get_text(separator=" ", strip=True))
+                val = extract_courses(
+                    value.get_text(separator=" ", strip=True))
             else:
                 val = value.get_text(separator=" ", strip=True)
             dict[name.get_text(strip=True)] = val
@@ -63,33 +65,50 @@ def extract_max_pages(page):
         return 1
     return int(match.group(1))
 
+
 def extract_courses(vals):
     return sorted(
-        f"({course.strip()}"
+        convert_course_name(course.strip())
         for course in vals.split("(")
         if course.strip()
     )
 
+
 def extract_courses_codes(page):
     soup = BeautifulSoup(page, "html.parser")
-    select = soup.find("select", id = "corso")
+    select = soup.find("select", id="corso")
     if select is None:
         raise IncorrectHTMLlayout('select id="corso"')
     codes = {}
     for option in select.find_all("option"):
         code = option['value']
-        name = option.get_text(separator=" ", strip=True).replace("\t", "").replace("\n", " ")
+        name = option.get_text(separator=" ", strip=True).replace(
+            "\t", "").replace("\n", " ")
         codes[code] = name
     return codes
 
+
 def extract_faculty_codes(page):
     soup = BeautifulSoup(page, "html.parser")
-    select = soup.find("select", id = "facolta")
+    select = soup.find("select", id="facolta")
     if select is None:
         raise IncorrectHTMLlayout('select id="facolta"')
     codes = {}
     for option in select.find_all("option"):
         code = option['value']
-        name = option.get_text(separator=" ", strip=True).replace("\t", "").replace("\n", " ")
+        name = option.get_text(separator=" ", strip=True).replace(
+            "\t", "").replace("\n", " ")
         codes[code] = name
     return codes
+
+
+def convert_course_name(name):
+    # Example of a name:  "(34 ) INFORMATICA - Scienze"
+    # TODO Improve file reading placement
+    with open("data/course_codes.json", "r") as f:
+        codes = json.load(f)
+    match = re.search(r"\d+", name)
+    if match is None:
+        print(f"[WARNING] No number: '{name}'")
+        return name
+    return codes[str(match.group(0))]

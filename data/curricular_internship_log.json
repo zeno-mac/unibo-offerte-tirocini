@@ -26,9 +26,9 @@
     "Eventuali conoscenze informatiche richieste:": "",
     "Note:": "",
     "Corsi:": [
-      "(1020 ) ARTIFICIAL INTELLIGENCE - Ingegneria",
-      "(257 ) SCIENZE E TECNOLOGIE INFORMATICHE - Scienze",
-      "(33 ) INFORMATICA - Scienze"
+      "ARTIFICIAL INTELLIGENCE (Laurea di secondo livello)",
+      "INFORMATICA (Laurea Triennale)",
+      "SCIENZE E TECNOLOGIE INFORMATICHE (Laurea di secondo livello)"
     ]
   },
   {
@@ -58,12 +58,12 @@
     "Eventuali conoscenze informatiche richieste:": "",
     "Note:": "",
     "Corsi:": [
-      "(1020 ) ARTIFICIAL INTELLIGENCE - Ingegneria",
-      "(210 ) INFORMATICA PER IL MANAGEMENT - Scienze",
-      "(24 ) MATEMATICA - Scienze",
-      "(257 ) SCIENZE E TECNOLOGIE INFORMATICHE - Scienze",
-      "(314 ) MATEMATICA INFORMATICO - COMPUTAZIONALE - Scienze",
-      "(33 ) INFORMATICA - Scienze"
+      "ARTIFICIAL INTELLIGENCE (Laurea di secondo livello)",
+      "INFORMATICA (Laurea Triennale)",
+      "INFORMATICA PER IL MANAGEMENT (Laurea Triennale)",
+      "MATEMATICA (Laurea di secondo livello)",
+      "MATEMATICA INFORMATICO - COMPUTAZIONALE (Laurea Triennale)",
+      "SCIENZE E TECNOLOGIE INFORMATICHE (Laurea di secondo livello)"
     ]
   },
   {
@@ -93,11 +93,11 @@
     "Eventuali conoscenze informatiche richieste:": "",
     "Note:": "Il tirocinio può essere abbinato con la tesi. Opportunità in seguito di conoscere aziende che operano nel settore del LegalTech all'interno delle istituzioni del Ministero della Giustizia.",
     "Corsi:": [
-      "(1020 ) ARTIFICIAL INTELLIGENCE - Ingegneria",
-      "(155 ) INGEGNERIA INFORMATICA - Ingegneria e architettura",
-      "(159 ) INGEGNERIA INFORMATICA - Ingegneria e architettura",
-      "(34 ) INFORMATICA - Scienze",
-      "(712 ) INGEGNERIA E SCIENZE INFORMATICHE - Ingegneria e architettura"
+      "ARTIFICIAL INTELLIGENCE (Laurea di secondo livello)",
+      "INFORMATICA (Laurea di secondo livello)",
+      "INGEGNERIA E SCIENZE INFORMATICHE (Laurea di secondo livello)",
+      "INGEGNERIA INFORMATICA (Laurea di secondo livello)",
+      "INGEGNERIA INFORMATICA (Laurea di secondo livello)"
     ]
   },
   {
@@ -127,14 +127,14 @@
     "Eventuali conoscenze informatiche richieste:": "",
     "Note:": "",
     "Corsi:": [
-      "(1020 ) ARTIFICIAL INTELLIGENCE - Ingegneria",
-      "(1049 ) Tecnologie dei sistemi informatici - Ingegneria e architettura",
-      "(154 ) INGEGNERIA INFORMATICA - Ingegneria e architettura",
-      "(155 ) INGEGNERIA INFORMATICA - Ingegneria e architettura",
-      "(33 ) INFORMATICA - Scienze",
-      "(34 ) INFORMATICA - Scienze",
-      "(712 ) INGEGNERIA E SCIENZE INFORMATICHE - Ingegneria e architettura",
-      "(731 ) INGEGNERIA E SCIENZE INFORMATICHE - Ingegneria e architettura"
+      "ARTIFICIAL INTELLIGENCE (Laurea di secondo livello)",
+      "INFORMATICA (Laurea Triennale)",
+      "INFORMATICA (Laurea di secondo livello)",
+      "INGEGNERIA E SCIENZE INFORMATICHE (Laurea Triennale)",
+      "INGEGNERIA E SCIENZE INFORMATICHE (Laurea di secondo livello)",
+      "INGEGNERIA INFORMATICA (Laurea Triennale)",
+      "INGEGNERIA INFORMATICA (Laurea di secondo livello)",
+      "Tecnologie dei sistemi informatici (Laurea Triennale)"
     ]
   },
   {
@@ -164,11 +164,11 @@
     "Eventuali conoscenze informatiche richieste:": "",
     "Note:": "Si forniscono tirocini combinati con la tesi. Il tema è molto attuale. Possibilità di pubblicare e di prepararsi a presentare proposte per la selezione nell'ambito dei dottorati scientifici e anche interdisciplinari (LAST-JD).",
     "Corsi:": [
-      "(1020 ) ARTIFICIAL INTELLIGENCE - Ingegneria",
-      "(155 ) INGEGNERIA INFORMATICA - Ingegneria e architettura",
-      "(159 ) INGEGNERIA INFORMATICA - Ingegneria e architettura",
-      "(34 ) INFORMATICA - Scienze",
-      "(712 ) INGEGNERIA E SCIENZE INFORMATICHE - Ingegneria e architettura"
+      "ARTIFICIAL INTELLIGENCE (Laurea di secondo livello)",
+      "INFORMATICA (Laurea di secondo livello)",
+      "INGEGNERIA E SCIENZE INFORMATICHE (Laurea di secondo livello)",
+      "INGEGNERIA INFORMATICA (Laurea di secondo livello)",
+      "INGEGNERIA INFORMATICA (Laurea di secondo livello)"
     ]
   },
   {
@@ -198,13 +198,13 @@
     "Eventuali conoscenze informatiche richieste:": "E’ richiesto il possesso di esperienza di programmazione di applicativi web basati su paradigma API-REST, Linguaggi PHP e Javascript, Framework Laravel e ReactJS, database relazionali e non relazionali",
     "Note:": "Possibilità di proseguire l'attività di tirocinio con tesi",
     "Corsi:": [
-      "(154 ) INGEGNERIA INFORMATICA - Ingegneria e architettura",
-      "(155 ) INGEGNERIA INFORMATICA - Ingegneria e architettura",
-      "(210 ) INFORMATICA PER IL MANAGEMENT - Scienze",
-      "(33 ) INFORMATICA - Scienze",
-      "(34 ) INFORMATICA - Scienze",
-      "(712 ) INGEGNERIA E SCIENZE INFORMATICHE - Ingegneria e architettura",
-      "(731 ) INGEGNERIA E SCIENZE INFORMATICHE - Ingegneria e architettura"
+      "INFORMATICA (Laurea Triennale)",
+      "INFORMATICA (Laurea di secondo livello)",
+      "INFORMATICA PER IL MANAGEMENT (Laurea Triennale)",
+      "INGEGNERIA E SCIENZE INFORMATICHE (Laurea Triennale)",
+      "INGEGNERIA E SCIENZE INFORMATICHE (Laurea di secondo livello)",
+      "INGEGNERIA INFORMATICA (Laurea Triennale)",
+      "INGEGNERIA INFORMATICA (Laurea di secondo livello)"
     ]
   },
   {
@@ -234,27 +234,27 @@
     "Eventuali conoscenze informatiche richieste:": "Familiarità con l’ambiente Linux",
     "Note:": "Data la specificità dei metodi di ricerca, parti anche consistenti delle attività possono essere svolte in modalità “da remoto”. Le attività riguardano sia il lavoro di ricerca, abilitato dalla connessione con le infrastrutture CNR, che l’interazione con i gruppi di lavoro. E’ quindi fortemente consigliata la possibilità di usufruire di una postazione di lavoro in modalità “smart working”, con accesso ad internet.",
     "Corsi:": [
-      "(1020 ) ARTIFICIAL INTELLIGENCE - Ingegneria",
-      "(1030 ) ADVANCED AUTOMOTIVE ENGINEERING - Ingegneria e architettura",
-      "(1036 ) CHEMICAL INNOVATION E REGULATION - Scienze",
-      "(1045 ) ADVANCED SPECTROSCOPY IN CHEMISTRY - Scienze",
-      "(154 ) INGEGNERIA INFORMATICA - Ingegneria e architettura",
-      "(155 ) INGEGNERIA INFORMATICA - Ingegneria e architettura",
-      "(192 ) INGEGNERIA DELL'AUTOMAZIONE - Ingegneria e architettura",
-      "(193 ) INGEGNERIA DELL'AUTOMAZIONE - Ingegneria e architettura",
-      "(229 ) CHIMICA E CHIMICA DEI MATERIALI - Scienze",
-      "(23 ) MATEMATICA - Scienze",
-      "(24 ) MATEMATICA - Scienze",
-      "(262 ) FOTOCHIMICA E MATERIALI MOLECOLARI - Scienze",
-      "(3 ) FISICA - Scienze",
-      "(314 ) MATEMATICA INFORMATICO - COMPUTAZIONALE - Scienze",
-      "(33 ) INFORMATICA - Scienze",
-      "(34 ) INFORMATICA - Scienze",
-      "(8 ) CHIMICA - Scienze",
-      "(91 ) CHIMICA INDUSTRIALE - Scienze",
-      "(92 ) CHIMICA INDUSTRIALE - Scienze",
-      "(974 ) ADVANCED AUTOMOTIVE ELECTRONIC ENGINEERING - Ingegneria e architettura",
-      "(980 ) AUTOMATION ENGINEERING / INGEGNERIA DELL’AUTOMAZIONE - Ingegneria e architettura"
+      "ADVANCED AUTOMOTIVE ELECTRONIC ENGINEERING (Laurea di secondo livello)",
+      "ADVANCED AUTOMOTIVE ENGINEERING (Laurea di secondo livello)",
+      "ADVANCED SPECTROSCOPY IN CHEMISTRY (Laurea di secondo livello)",
+      "ARTIFICIAL INTELLIGENCE (Laurea di secondo livello)",
+      "AUTOMATION ENGINEERING / INGEGNERIA DELL’AUTOMAZIONE (Laurea di secondo livello)",
+      "CHEMICAL INNOVATION E REGULATION (Laurea di secondo livello)",
+      "CHIMICA (Laurea di secondo livello)",
+      "CHIMICA E CHIMICA DEI MATERIALI (Laurea Triennale)",
+      "CHIMICA INDUSTRIALE (Laurea Triennale)",
+      "CHIMICA INDUSTRIALE (Laurea di secondo livello)",
+      "FISICA (Laurea Triennale)",
+      "FOTOCHIMICA E MATERIALI MOLECOLARI (Laurea di secondo livello)",
+      "INFORMATICA (Laurea Triennale)",
+      "INFORMATICA (Laurea di secondo livello)",
+      "INGEGNERIA DELL'AUTOMAZIONE (Laurea Triennale)",
+      "INGEGNERIA DELL'AUTOMAZIONE (Laurea di secondo livello)",
+      "INGEGNERIA INFORMATICA (Laurea Triennale)",
+      "INGEGNERIA INFORMATICA (Laurea di secondo livello)",
+      "MATEMATICA (Laurea Triennale)",
+      "MATEMATICA (Laurea di secondo livello)",
+      "MATEMATICA INFORMATICO - COMPUTAZIONALE (Laurea Triennale)"
     ]
   },
   {
@@ -284,10 +284,10 @@
     "Eventuali conoscenze informatiche richieste:": "Familiarity with Python",
     "Note:": "",
     "Corsi:": [
-      "(1020 ) ARTIFICIAL INTELLIGENCE - Ingegneria",
-      "(257 ) SCIENZE E TECNOLOGIE INFORMATICHE - Scienze",
-      "(34 ) INFORMATICA - Scienze",
-      "(712 ) INGEGNERIA E SCIENZE INFORMATICHE - Ingegneria e architettura"
+      "ARTIFICIAL INTELLIGENCE (Laurea di secondo livello)",
+      "INFORMATICA (Laurea di secondo livello)",
+      "INGEGNERIA E SCIENZE INFORMATICHE (Laurea di secondo livello)",
+      "SCIENZE E TECNOLOGIE INFORMATICHE (Laurea di secondo livello)"
     ]
   },
   {
@@ -317,11 +317,11 @@
     "Eventuali conoscenze informatiche richieste:": "",
     "Note:": "",
     "Corsi:": [
-      "(1020 ) ARTIFICIAL INTELLIGENCE - Ingegneria",
-      "(155 ) INGEGNERIA INFORMATICA - Ingegneria e architettura",
-      "(193 ) INGEGNERIA DELL'AUTOMAZIONE - Ingegneria e architettura",
-      "(34 ) INFORMATICA - Scienze",
-      "(980 ) AUTOMATION ENGINEERING / INGEGNERIA DELL’AUTOMAZIONE - Ingegneria e architettura"
+      "ARTIFICIAL INTELLIGENCE (Laurea di secondo livello)",
+      "AUTOMATION ENGINEERING / INGEGNERIA DELL’AUTOMAZIONE (Laurea di secondo livello)",
+      "INFORMATICA (Laurea di secondo livello)",
+      "INGEGNERIA DELL'AUTOMAZIONE (Laurea di secondo livello)",
+      "INGEGNERIA INFORMATICA (Laurea di secondo livello)"
     ]
   },
   {
@@ -351,8 +351,8 @@
     "Eventuali conoscenze informatiche richieste:": "Java EE - SQL - XML - HTML5 - CSS Javascript - Android - IOS",
     "Note:": "",
     "Corsi:": [
-      "(154 ) INGEGNERIA INFORMATICA - Ingegneria e architettura",
-      "(33 ) INFORMATICA - Scienze"
+      "INFORMATICA (Laurea Triennale)",
+      "INGEGNERIA INFORMATICA (Laurea Triennale)"
     ]
   },
   {
@@ -382,11 +382,11 @@
     "Eventuali conoscenze informatiche richieste:": "Python, PyTorch, NumPy",
     "Note:": "",
     "Corsi:": [
-      "(155 ) INGEGNERIA INFORMATICA - Ingegneria e architettura",
-      "(159 ) INGEGNERIA INFORMATICA - Ingegneria e architettura",
-      "(257 ) SCIENZE E TECNOLOGIE INFORMATICHE - Scienze",
-      "(34 ) INFORMATICA - Scienze",
-      "(712 ) INGEGNERIA E SCIENZE INFORMATICHE - Ingegneria e architettura"
+      "INFORMATICA (Laurea di secondo livello)",
+      "INGEGNERIA E SCIENZE INFORMATICHE (Laurea di secondo livello)",
+      "INGEGNERIA INFORMATICA (Laurea di secondo livello)",
+      "INGEGNERIA INFORMATICA (Laurea di secondo livello)",
+      "SCIENZE E TECNOLOGIE INFORMATICHE (Laurea di secondo livello)"
     ]
   },
   {
@@ -416,15 +416,15 @@
     "Eventuali conoscenze informatiche richieste:": "",
     "Note:": "",
     "Corsi:": [
-      "(1049 ) Tecnologie dei sistemi informatici - Ingegneria e architettura",
-      "(154 ) INGEGNERIA INFORMATICA - Ingegneria e architettura",
-      "(155 ) INGEGNERIA INFORMATICA - Ingegneria e architettura",
-      "(159 ) INGEGNERIA INFORMATICA - Ingegneria e architettura",
-      "(210 ) INFORMATICA PER IL MANAGEMENT - Scienze",
-      "(263 ) INGEGNERIA DEI PROCESSI GESTIONALI - Ingegneria e architettura",
-      "(33 ) INFORMATICA - Scienze",
-      "(34 ) INFORMATICA - Scienze",
-      "(731 ) INGEGNERIA E SCIENZE INFORMATICHE - Ingegneria e architettura"
+      "INFORMATICA (Laurea Triennale)",
+      "INFORMATICA (Laurea di secondo livello)",
+      "INFORMATICA PER IL MANAGEMENT (Laurea Triennale)",
+      "INGEGNERIA DEI PROCESSI GESTIONALI (Laurea Triennale)",
+      "INGEGNERIA E SCIENZE INFORMATICHE (Laurea Triennale)",
+      "INGEGNERIA INFORMATICA (Laurea Triennale)",
+      "INGEGNERIA INFORMATICA (Laurea di secondo livello)",
+      "INGEGNERIA INFORMATICA (Laurea di secondo livello)",
+      "Tecnologie dei sistemi informatici (Laurea Triennale)"
     ]
   },
   {
@@ -454,14 +454,14 @@
     "Eventuali conoscenze informatiche richieste:": "",
     "Note:": "",
     "Corsi:": [
-      "(1049 ) Tecnologie dei sistemi informatici - Ingegneria e architettura",
-      "(154 ) INGEGNERIA INFORMATICA - Ingegneria e architettura",
-      "(155 ) INGEGNERIA INFORMATICA - Ingegneria e architettura",
-      "(159 ) INGEGNERIA INFORMATICA - Ingegneria e architettura",
-      "(210 ) INFORMATICA PER IL MANAGEMENT - Scienze",
-      "(33 ) INFORMATICA - Scienze",
-      "(34 ) INFORMATICA - Scienze",
-      "(731 ) INGEGNERIA E SCIENZE INFORMATICHE - Ingegneria e architettura"
+      "INFORMATICA (Laurea Triennale)",
+      "INFORMATICA (Laurea di secondo livello)",
+      "INFORMATICA PER IL MANAGEMENT (Laurea Triennale)",
+      "INGEGNERIA E SCIENZE INFORMATICHE (Laurea Triennale)",
+      "INGEGNERIA INFORMATICA (Laurea Triennale)",
+      "INGEGNERIA INFORMATICA (Laurea di secondo livello)",
+      "INGEGNERIA INFORMATICA (Laurea di secondo livello)",
+      "Tecnologie dei sistemi informatici (Laurea Triennale)"
     ]
   },
   {
@@ -491,10 +491,10 @@
     "Eventuali conoscenze informatiche richieste:": "JS, APIs, Windows",
     "Note:": "",
     "Corsi:": [
-      "(210 ) INFORMATICA PER IL MANAGEMENT - Scienze",
-      "(23 ) MATEMATICA - Scienze",
-      "(314 ) MATEMATICA INFORMATICO - COMPUTAZIONALE - Scienze",
-      "(731 ) INGEGNERIA E SCIENZE INFORMATICHE - Ingegneria e architettura"
+      "INFORMATICA PER IL MANAGEMENT (Laurea Triennale)",
+      "INGEGNERIA E SCIENZE INFORMATICHE (Laurea Triennale)",
+      "MATEMATICA (Laurea Triennale)",
+      "MATEMATICA INFORMATICO - COMPUTAZIONALE (Laurea Triennale)"
     ]
   },
   {
@@ -524,10 +524,10 @@
     "Eventuali conoscenze informatiche richieste:": "JS, APIs, Windows",
     "Note:": "",
     "Corsi:": [
-      "(210 ) INFORMATICA PER IL MANAGEMENT - Scienze",
-      "(23 ) MATEMATICA - Scienze",
-      "(314 ) MATEMATICA INFORMATICO - COMPUTAZIONALE - Scienze",
-      "(731 ) INGEGNERIA E SCIENZE INFORMATICHE - Ingegneria e architettura"
+      "INFORMATICA PER IL MANAGEMENT (Laurea Triennale)",
+      "INGEGNERIA E SCIENZE INFORMATICHE (Laurea Triennale)",
+      "MATEMATICA (Laurea Triennale)",
+      "MATEMATICA INFORMATICO - COMPUTAZIONALE (Laurea Triennale)"
     ]
   },
   {
@@ -557,18 +557,18 @@
     "Eventuali conoscenze informatiche richieste:": "",
     "Note:": "",
     "Corsi:": [
-      "(1020 ) ARTIFICIAL INTELLIGENCE - Ingegneria",
-      "(1035 )  DIGITAL TRANSFORMATION MANAGEMENT - Ingegneria e architettura",
-      "(1049 ) Tecnologie dei sistemi informatici - Ingegneria e architettura",
-      "(142 ) INGEGNERIA GESTIONALE - Ingegneria e architettura",
-      "(154 ) INGEGNERIA INFORMATICA - Ingegneria e architettura",
-      "(155 ) INGEGNERIA INFORMATICA - Ingegneria e architettura",
-      "(159 ) INGEGNERIA INFORMATICA - Ingegneria e architettura",
-      "(257 ) SCIENZE E TECNOLOGIE INFORMATICHE - Scienze",
-      "(34 ) INFORMATICA - Scienze",
-      "(712 ) INGEGNERIA E SCIENZE INFORMATICHE - Ingegneria e architettura",
-      "(731 ) INGEGNERIA E SCIENZE INFORMATICHE - Ingegneria e architettura",
-      "(98 ) SCIENZE DI INTERNET - Scienze"
+      "ARTIFICIAL INTELLIGENCE (Laurea di secondo livello)",
+      "DIGITAL TRANSFORMATION MANAGEMENT (Laurea di secondo livello)",
+      "INFORMATICA (Laurea di secondo livello)",
+      "INGEGNERIA E SCIENZE INFORMATICHE (Laurea Triennale)",
+      "INGEGNERIA E SCIENZE INFORMATICHE (Laurea di secondo livello)",
+      "INGEGNERIA GESTIONALE (Laurea Triennale)",
+      "INGEGNERIA INFORMATICA (Laurea Triennale)",
+      "INGEGNERIA INFORMATICA (Laurea di secondo livello)",
+      "INGEGNERIA INFORMATICA (Laurea di secondo livello)",
+      "SCIENZE DI INTERNET (Laurea di secondo livello)",
+      "SCIENZE E TECNOLOGIE INFORMATICHE (Laurea di secondo livello)",
+      "Tecnologie dei sistemi informatici (Laurea Triennale)"
     ]
   }
 ]
