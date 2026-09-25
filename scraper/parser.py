@@ -1,6 +1,6 @@
 from bs4 import BeautifulSoup
 import re
-
+import json
 
 class IncorrectHTMLlayout(Exception):
     def __init__(self, target):
@@ -63,10 +63,33 @@ def extract_max_pages(page):
         return 1
     return int(match.group(1))
 
-
 def extract_courses(vals):
     return sorted(
         f"({course.strip()}"
         for course in vals.split("(")
         if course.strip()
     )
+
+def extract_courses_codes(page):
+    soup = BeautifulSoup(page, "html.parser")
+    select = soup.find("select", id = "corso")
+    if select is None:
+        raise IncorrectHTMLlayout('select id="corso"')
+    codes = {}
+    for option in select.find_all("option"):
+        code = option['value']
+        name = option.get_text(separator=" ", strip=True).replace("\t", "").replace("\n", " ")
+        codes[code] = name
+    return codes
+
+def extract_faculty_codes(page):
+    soup = BeautifulSoup(page, "html.parser")
+    select = soup.find("select", id = "facolta")
+    if select is None:
+        raise IncorrectHTMLlayout('select id="facolta"')
+    codes = {}
+    for option in select.find_all("option"):
+        code = option['value']
+        name = option.get_text(separator=" ", strip=True).replace("\t", "").replace("\n", " ")
+        codes[code] = name
+    return codes
