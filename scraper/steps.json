@@ -20,9 +20,9 @@
             "denominazioneAzienda": "",
             "cerca": "Search",
             "_soloOfferteConAllegatoTpv": "on",
-            "tipoCiclo": "1",
-            "facolta": "AMB9",
-            "corso": "33",
+            "tipoCiclo": "ALL",
+            "facolta": "ALL",
+            "corso": "",
             "form_submit": "true"
         }
     }
