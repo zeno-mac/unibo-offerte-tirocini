@@ -271,10 +271,16 @@ const CURR_FIELDS = {
     cycle: "Ciclo:",
 };
 
-// "Corsi:" is a run of "( id ) NOME CORSO - AREA" chunks with no separator;
-// pull out the distinct course names.
-function parseCorsi(s) {
+// Current data stores course labels as an array. Keep parsing the legacy
+// encoded string format so older downloaded logs remain usable.
+function parseCorsi(value) {
+    if (Array.isArray(value)) {
+        return value.map((course) => fixText(course)).filter(Boolean);
+    }
+
+    const s = fixText(value);
     if (!s) return [];
+
     const re = /\(\s*\d+\s*\)\s*([^()]+?)\s*-\s*[^()]+?(?=\s*\(|$)/g;
     const out = [];
     let m;
@@ -291,7 +297,7 @@ function normalizeCurricular(rec, idx) {
     const tutorFirst = fixText(r[CURR_FIELDS.tutorFirst]);
     const tutorLast = fixText(r[CURR_FIELDS.tutorLast]);
     const indennita = fixText(r[CURR_FIELDS.indennita]);
-    const corsiRaw = fixText(r[CURR_FIELDS.corsi]);
+    const corsiRaw = r[CURR_FIELDS.corsi];
     const o = {
         _raw: rec,
         idx,
@@ -426,6 +432,13 @@ const TYPE_CONFIGS = {
     },
 };
 
+const SORT_OPTIONS = [
+    { value: "az", label: "Azienda (A → Z)" },
+    { value: "za", label: "Azienda (Z → A)" },
+    { value: "comune", label: "Comune (A → Z)" },
+    { value: "recent", label: "Più recenti" },
+];
+
 function freshTypeState(cfg) {
     const other = {};
     for (const f of cfg.otherFilters) other[f.key] = false;
@@ -437,7 +450,10 @@ function freshTypeState(cfg) {
         search: "",
         sort: "az",
         categories: new Set(),
+        categorySearch: "",
+        showAllCategories: false,
         comune: "",
+        comuneSearch: "",
         other,
     };
 }
@@ -527,8 +543,6 @@ function buildFilterControls() {
     const cfg = currentCfg();
     const s = currentState();
 
-    document.getElementById("category-label").textContent = cfg.categoryLabel;
-
     const catCounts = new Map();
     const comuni = new Set();
     for (const o of s.all) {
@@ -536,26 +550,28 @@ function buildFilterControls() {
         if (o.comune) comuni.add(o.comune);
     }
 
-    document.getElementById("category-checks").innerHTML = [...catCounts.entries()]
+    const categories = [...catCounts.entries()]
         .sort((a, b) => b[1] - a[1] || collator.compare(a[0], b[0]))
-        .map(([t, c]) => `<label class="check"><input type="checkbox" value="${esc(t)}" ${s.categories.has(t) ? "checked" : ""}><span>${esc(t)}</span><span class="c">${c}</span></label>`)
+    const categorySelect = document.getElementById("category");
+    categorySelect.innerHTML = `<option value="">${esc(cfg.categoryLabel)}</option>` + categories
+        .map(([name, count]) => `<option value="${esc(name)}">${esc(name)} (${count})</option>`)
         .join("");
+    categorySelect.value = [...s.categories][0] || "";
 
-    const comuneSel = document.getElementById("comune");
-    comuneSel.innerHTML = '<option value="">Tutti i comuni</option>';
-    for (const c of [...comuni].sort(collator.compare)) {
-        const opt = document.createElement("option");
-        opt.value = c;
-        opt.textContent = c;
-        comuneSel.appendChild(opt);
-    }
-    comuneSel.value = s.comune;
+    const comuneSelect = document.getElementById("comune");
+    comuneSelect.innerHTML = '<option value="">Tutti i comuni</option>' + [...comuni].sort(collator.compare)
+        .map((name) => `<option value="${esc(name)}">${esc(name)}</option>`)
+        .join("");
+    comuneSelect.value = s.comune;
 
     document.getElementById("other-checks").innerHTML = cfg.otherFilters
         .map((f) => `<label class="check"><input type="checkbox" data-key="${esc(f.key)}" ${s.other[f.key] ? "checked" : ""}> <span>${esc(f.label)}</span></label>`)
         .join("");
 
     document.getElementById("search").value = s.search;
+    document.getElementById("sort").innerHTML = SORT_OPTIONS
+        .map((option) => `<option value="${option.value}">${option.label}</option>`)
+        .join("");
     document.getElementById("sort").value = s.sort;
 }
 
@@ -589,12 +605,10 @@ function wireEvents() {
         applyFilters();
     });
 
-    document.getElementById("category-checks").addEventListener("change", (e) => {
-        const cb = e.target;
-        if (!cb.matches("input[type=checkbox]")) return;
+    document.getElementById("category").addEventListener("change", (e) => {
         const s = currentState();
-        if (cb.checked) s.categories.add(cb.value);
-        else s.categories.delete(cb.value);
+        s.categories.clear();
+        if (e.target.value) s.categories.add(e.target.value);
         applyFilters();
     });
 
@@ -639,7 +653,6 @@ function wireEvents() {
         if (!btn || btn.dataset.type === state.activeType) return;
         state.activeType = btn.dataset.type;
         refreshTypeUI();
-        document.body.classList.remove("filters-open");
     });
 
     document.getElementById("download-json").addEventListener("click", () => {
@@ -656,15 +669,15 @@ function wireEvents() {
         URL.revokeObjectURL(url);
     });
 
-    document.getElementById("toggle-filters").addEventListener("click", () => {
-        document.body.classList.toggle("filters-open");
+    document.querySelectorAll(".filter-dropdown").forEach((dropdown) => {
+        dropdown.addEventListener("toggle", () => {
+            if (!dropdown.open) return;
+            document.querySelectorAll(".filter-dropdown").forEach((other) => {
+                if (other !== dropdown) other.open = false;
+            });
+        });
     });
-    document.getElementById("scrim").addEventListener("click", () => {
-        document.body.classList.remove("filters-open");
-    });
-    document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape") document.body.classList.remove("filters-open");
-    });
+
 }
 
 /* ---------- Boot ---------- */
