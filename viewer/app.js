@@ -225,9 +225,18 @@ function cardHTMLExtra(o) {
     
     const sectors = o.sectors ? `<p class="prose dim card-sectors">${escHl(o.sectors)}</p>` : "";
     
+    const s = typeof state !== "undefined" && state.activeType ? currentState() : null;
+    const tokens = s && s.search ? s.search.toLowerCase().split(/\s+/).filter(Boolean) : [];
+
     let hasMore = false;
+    let autoExpand = false;
     const fullText = (o.description + "\\n\\n" + o.note).trim();
-    if (fullText.length > 300) hasMore = true;
+    if (fullText.length > 300) {
+        hasMore = true;
+        if (tokens.length > 0 && tokens.some(t => fullText.toLowerCase().includes(t))) {
+            autoExpand = true;
+        }
+    }
     
     const locationStr = [o.comune, o.province && o.province !== o.comune ? o.province : ""].filter(Boolean).join(" - ").toUpperCase();
     
@@ -236,7 +245,7 @@ function cardHTMLExtra(o) {
         o.email && `<div class="meta-row"><svg viewBox="0 0 24 24" class="meta-icon"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg><a href="mailto:${esc(o.email)}">${escHl(o.email)}</a></div>`
     ].filter(Boolean).join("");
 
-    return `<article class="card ${hasMore ? 'has-more' : ''}" id="offer-${esc(o.id)}">
+    return `<article class="card ${hasMore ? 'has-more' : ''} ${autoExpand ? 'expanded' : ''}" id="offer-${esc(o.id)}">
         <div class="card-layout">
             <div class="card-col-left">
                 <div class="card-title-wrap">
@@ -253,7 +262,7 @@ function cardHTMLExtra(o) {
                     <div class="prose">${escHl(o.description)}</div>
                     ${o.note ? `<div class="card-section-title mt-3">Note</div><div class="prose">${escHl(o.note)}</div>` : ''}
                 </div>
-                ${hasMore ? `<div class="show-more-wrap"><button type="button" class="show-more-btn pill-btn">Mostra tutto ⌄</button></div>` : ''}
+                ${hasMore ? `<div class="show-more-wrap"><button type="button" class="show-more-btn pill-btn">${autoExpand ? 'Mostra meno &#8963;' : 'Mostra tutto &#8964;'}</button></div>` : ''}
             </div>
             
             <div class="card-col-right">
@@ -369,9 +378,18 @@ function cardHTMLCurricular(o) {
     const corsiText = o.corsi.join(" • ");
     const sectors = corsiText ? `<p class="prose dim card-sectors">${escHl(corsiText)}</p>` : "";
     
+    const s = typeof state !== "undefined" && state.activeType ? currentState() : null;
+    const tokens = s && s.search ? s.search.toLowerCase().split(/\s+/).filter(Boolean) : [];
+
     let hasMore = false;
+    let autoExpand = false;
     const fullText = (o.oggetto + "\\n" + o.obiettivi + "\\n" + o.attivita).trim();
-    if (fullText.length > 300) hasMore = true;
+    if (fullText.length > 300) {
+        hasMore = true;
+        if (tokens.length > 0 && tokens.some(t => fullText.toLowerCase().includes(t))) {
+            autoExpand = true;
+        }
+    }
     
     const locationStr = [o.comune, o.province && o.province !== o.comune ? o.province : ""].filter(Boolean).join(" - ").toUpperCase();
     
@@ -380,7 +398,7 @@ function cardHTMLCurricular(o) {
         o.tutor && `<div class="meta-row"><svg viewBox="0 0 24 24" class="meta-icon"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>${escHl(o.tutor)}</div>`
     ].filter(Boolean).join("");
 
-    return `<article class="card ${hasMore ? 'has-more' : ''}" id="offer-${esc(o.id)}">
+    return `<article class="card ${hasMore ? 'has-more' : ''} ${autoExpand ? 'expanded' : ''}" id="offer-${esc(o.id)}">
         <div class="card-layout">
             <div class="card-col-left">
                 <div class="card-title-wrap">
@@ -398,7 +416,7 @@ function cardHTMLCurricular(o) {
                     ${o.obiettivi ? `<div class="card-section-title mt-3">Obiettivi</div><div class="prose">${escHl(o.obiettivi)}</div>` : ''}
                     ${o.attivita ? `<div class="card-section-title mt-3">Attività</div><div class="prose">${escHl(o.attivita)}</div>` : ''}
                 </div>
-                ${hasMore ? `<div class="show-more-wrap"><button type="button" class="show-more-btn pill-btn">Mostra tutto ⌄</button></div>` : ''}
+                ${hasMore ? `<div class="show-more-wrap"><button type="button" class="show-more-btn pill-btn">${autoExpand ? 'Mostra meno &#8963;' : 'Mostra tutto &#8964;'}</button></div>` : ''}
             </div>
             
             <div class="card-col-right">
