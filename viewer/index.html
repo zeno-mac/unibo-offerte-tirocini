@@ -27,6 +27,11 @@
         <main class="results">
             <div class="results-head">
                 <span id="count" class="count"></span>
+
+                <button type="button" id="mobile-filters-btn" class="action">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z"/></svg> Filtri
+                </button>
+
                 <div class="filter-bar" id="filter-bar">
                     <select id="sort" class="filter-select" aria-label="Ordina per"></select>
                     <select id="category" class="filter-select category-select" aria-label="Categoria"></select>
@@ -42,7 +47,7 @@
 
                     <button type="button" id="clear-filters" class="link-btn">Azzera filtri</button>
                 </div>
-                <button type="button" id="download-json" class="action" style="margin-left: auto;">Download JSON</button>
+                <button type="button" id="download-json" class="action download-btn">Download JSON</button>
             </div>
             <div class="card-grid" id="card-grid"></div>
             <p class="notice" id="notice" hidden></p>

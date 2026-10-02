@@ -199,6 +199,15 @@ mark {
 .other-dropdown .filter-menu { min-width: 240px; }
 .filter-bar > .link-btn { margin-left: 2px; }
 
+.download-btn {
+    margin-left: auto;
+}
+
+#mobile-filters-btn {
+    display: none;
+    margin-left: auto;
+}
+
 /* ---------- Toggle switch ---------- */
 .toggle-switch-label {
     display: flex;
@@ -625,7 +634,31 @@ select:focus { border-color: var(--accent-border); }
 
 @media (max-width: 780px) {
     .brand-sub { display: none; }
-    .filter-bar { padding: 10px 12px; }
+    .results-head { flex-wrap: wrap; }
+    #mobile-filters-btn { display: inline-flex; }
+    .download-btn { display: none; }
+    .filter-bar { 
+        display: none; 
+        flex-basis: 100%; 
+        order: 3; 
+        flex-direction: column; 
+        align-items: flex-start; 
+        padding: 14px 0 0 0;
+        margin-top: 10px;
+        border-top: 1px solid var(--border-soft);
+    }
+    .filter-bar.open {
+        display: flex;
+    }
+    .filter-select {
+        width: 100%;
+        max-width: none;
+    }
+    .toggle-switch-label {
+        margin-left: 0;
+        margin-top: 4px;
+        margin-bottom: 4px;
+    }
 }
 
 @media (max-width: 560px) {

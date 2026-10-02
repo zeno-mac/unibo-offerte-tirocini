@@ -589,6 +589,13 @@ function refreshTypeUI() {
 
 /* ---------- Events ---------- */
 function wireEvents() {
+    const mobileFiltersBtn = document.getElementById("mobile-filters-btn");
+    const filterBar = document.getElementById("filter-bar");
+    if (mobileFiltersBtn && filterBar) {
+        mobileFiltersBtn.addEventListener("click", () => {
+            filterBar.classList.toggle("open");
+        });
+    }
     const searchInput = document.getElementById("search");
     let t;
     searchInput.addEventListener("input", () => {
