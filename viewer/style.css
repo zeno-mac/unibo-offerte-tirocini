@@ -447,6 +447,13 @@ select:focus { border-color: var(--accent-border); }
     line-height: 1.5;
 }
 
+.card.has-more:not(.expanded) .card-sectors {
+    display: -webkit-box;
+    -webkit-line-clamp: 10;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
 .card-col-center {
     flex: 1;
     min-width: 0;
@@ -462,23 +469,17 @@ select:focus { border-color: var(--accent-border); }
 }
 
 .card.has-more:not(.expanded) .card-desc {
-    max-height: 120px;
+    max-height: 200px;
     overflow: hidden;
-}
-
-.card.has-more:not(.expanded) .card-desc::after {
-    content: "";
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    height: 40px;
-    background: linear-gradient(transparent, var(--panel));
-    pointer-events: none;
+    -webkit-mask-image: linear-gradient(to bottom, black 150px, transparent 200px);
+    mask-image: linear-gradient(to bottom, black 150px, transparent 200px);
 }
 
 .show-more-wrap {
     display: flex;
     justify-content: center;
-    margin-top: 12px;
+    margin-top: auto;
+    padding-top: 12px;
 }
 .show-more-btn {
     display: flex;
@@ -498,6 +499,13 @@ select:focus { border-color: var(--accent-border); }
     flex-direction: column;
     gap: 8px;
     width: 100%;
+}
+
+.card.has-more:not(.expanded) .meta-rows {
+    max-height: 190px;
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(to bottom, black 150px, transparent 190px);
+    mask-image: linear-gradient(to bottom, black 150px, transparent 190px);
 }
 
 .meta-row {
