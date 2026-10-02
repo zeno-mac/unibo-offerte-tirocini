@@ -171,6 +171,35 @@ mark {
 }
 .link-btn:hover { text-decoration: underline; }
 
+/* ---------- Layout Switcher ---------- */
+.layout-switcher {
+    display: flex;
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-left: auto;
+}
+.layout-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 32px;
+    background: transparent;
+    border: none;
+    color: var(--text-faint);
+    cursor: pointer;
+}
+.layout-btn:hover {
+    color: var(--text);
+    background: var(--panel-3);
+}
+.layout-btn.active {
+    color: var(--accent);
+    background: var(--panel-3);
+}
+
 .filter-dropdown {
     position: relative;
 }
@@ -380,6 +409,43 @@ select:focus { border-color: var(--accent-border); }
     flex-direction: column;
     gap: 16px;
     padding: 18px;
+}
+
+.card-grid.is-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+}
+.card-grid.is-grid .card {
+    display: flex;
+    flex-direction: column;
+}
+.card-grid.is-grid .card-layout {
+    flex-direction: column;
+    gap: 16px;
+    flex: 1;
+}
+.card-grid.is-grid .card-col-left {
+    max-width: none;
+    flex: none;
+}
+.card-grid.is-grid .card-col-right {
+    flex: none;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: auto;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-soft);
+}
+.card-grid.is-grid .meta-rows {
+    width: auto;
+    gap: 12px;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+.card-grid.is-grid .details-link {
+    margin-top: 0;
 }
 
 .card {
@@ -622,13 +688,25 @@ select:focus { border-color: var(--accent-border); }
 }
 
 /* ---------- Responsive ---------- */
+.card.has-more.dynamically-fits .card-desc {
+    -webkit-mask-image: none !important;
+    mask-image: none !important;
+}
+.card.has-more.dynamically-fits .show-more-wrap {
+    display: none !important;
+}
+
 @media (max-width: 900px) {
+    .layout-switcher {
+        display: none;
+    }
     .card-layout {
         flex-direction: column;
         gap: 16px;
     }
     .card-col-left {
         max-width: none;
+        flex: none;
     }
     .card-col-right {
         flex: none;
@@ -636,7 +714,7 @@ select:focus { border-color: var(--accent-border); }
         flex-wrap: wrap;
         align-items: center;
         justify-content: space-between;
-        margin-top: 8px;
+        margin-top: auto;
         padding-top: 16px;
         border-top: 1px solid var(--border-soft);
     }
