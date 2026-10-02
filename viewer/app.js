@@ -267,7 +267,7 @@ function cardHTMLExtra(o) {
             
             <div class="card-col-right">
                 <div class="meta-rows">${metaRows}</div>
-                ${o.url ? `<a class="details-link" href="${esc(o.url)}" target="_blank" rel="noopener">Vedi Dettagli &rarr;</a>` : ''}
+                ${o.url ? `<a class="details-link" href="${esc(o.url)}" target="_blank" rel="noopener">Apri offerta &nearr;</a>` : ''}
             </div>
         </div>
     </article>`;
@@ -421,7 +421,7 @@ function cardHTMLCurricular(o) {
             
             <div class="card-col-right">
                 <div class="meta-rows">${metaRows}</div>
-                ${o.url ? `<a class="details-link" href="${esc(o.url)}" target="_blank" rel="noopener">Vedi Dettagli &rarr;</a>` : ''}
+                ${o.url ? `<a class="details-link" href="${esc(o.url)}" target="_blank" rel="noopener">Apri offerta &nearr;</a>` : ''}
             </div>
         </div>
     </article>`;
