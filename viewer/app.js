@@ -186,6 +186,22 @@ const EXTRA_FIELDS = {
     note: "Note:",
 };
 
+function parseSectors(s) {
+    if (!s) return [];
+    const parts = String(s).split(/\s+(?=[A-ZÀ-Ú])/);
+    const merged = [];
+    for (const part of parts) {
+        const p = part.trim();
+        if (!p) continue;
+        if (/^(Industriale|Residenziale|Commerciale|Istituti)/.test(p) && merged.length > 0) {
+            merged[merged.length - 1] += " " + p;
+        } else {
+            merged.push(p);
+        }
+    }
+    return merged;
+}
+
 function normalizeExtra(rec, idx) {
     const r = keyedRecord(rec);
     const url = r[EXTRA_FIELDS.url] || "";
@@ -199,7 +215,7 @@ function normalizeExtra(rec, idx) {
         company: cleanCompany(r[EXTRA_FIELDS.company]),
         type: fixText(r[EXTRA_FIELDS.type]),
         description: fixText(r[EXTRA_FIELDS.description]),
-        sectors: fixText(r[EXTRA_FIELDS.sectors]),
+        sectors: parseSectors(fixText(r[EXTRA_FIELDS.sectors])),
         country: fixText(r[EXTRA_FIELDS.country]),
         province: fixText(r[EXTRA_FIELDS.province]),
         comune: fixText(r[EXTRA_FIELDS.comune]),
@@ -212,9 +228,9 @@ function normalizeExtra(rec, idx) {
         web: fixText(r[EXTRA_FIELDS.web]),
         note: fixText(r[EXTRA_FIELDS.note]),
     };
-    o.categories = o.type ? [o.type] : [];
+    o.categories = o.sectors;
     o.haystack = [
-        o.company, o.type, o.description, o.sectors,
+        o.company, o.type, o.description, o.sectors.join(" "),
         o.comune, o.frazione, o.address, o.referent, o.email, o.web, o.note,
     ].join("  ").toLowerCase();
     return o;
@@ -223,7 +239,8 @@ function normalizeExtra(rec, idx) {
 function cardHTMLExtra(o) {
     const isBookmarked = Bookmarks.has(o.id);
     
-    const sectors = o.sectors ? `<p class="prose dim card-sectors">${escHl(o.sectors)}</p>` : "";
+    const sectorsText = o.sectors.join(" • ");
+    const sectors = sectorsText ? `<p class="prose dim card-sectors">${escHl(sectorsText)}</p>` : "";
     
     const s = typeof state !== "undefined" && state.activeType ? currentState() : null;
     const tokens = s && s.search ? s.search.toLowerCase().split(/\s+/).filter(Boolean) : [];
