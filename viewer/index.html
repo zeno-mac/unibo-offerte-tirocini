@@ -32,12 +32,13 @@
                     <select id="category" class="filter-select category-select" aria-label="Categoria"></select>
                     <select id="comune" class="filter-select comune-select" aria-label="Comune"></select>
 
-                    <details class="filter-dropdown other-dropdown">
-                        <summary>Altro</summary>
-                        <div class="filter-menu">
-                            <div class="checks" id="other-checks"></div>
+                    <label class="toggle-switch-label">
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="only-bookmarks">
+                            <span class="slider"></span>
                         </div>
-                    </details>
+                        Solo preferiti
+                    </label>
 
                     <button type="button" id="clear-filters" class="link-btn">Azzera filtri</button>
                 </div>

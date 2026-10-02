@@ -144,6 +144,27 @@ function keyedRecord(rec) {
     return m;
 }
 
+/* ================= Bookmarks ================= */
+const Bookmarks = {
+    get: function() {
+        try {
+            return new Set(JSON.parse(localStorage.getItem('offerte_bookmarks') || '[]'));
+        } catch(e) {
+            return new Set();
+        }
+    },
+    toggle: function(id) {
+        const b = this.get();
+        if (b.has(id)) b.delete(id);
+        else b.add(id);
+        localStorage.setItem('offerte_bookmarks', JSON.stringify([...b]));
+        return b.has(id);
+    },
+    has: function(id) {
+        return this.get().has(id);
+    }
+};
+
 /* ================= Extracurricular ================= */
 const EXTRA_FIELDS = {
     url: "Indirizzo dell'offerta:",
@@ -200,43 +221,46 @@ function normalizeExtra(rec, idx) {
 }
 
 function cardHTMLExtra(o) {
-    const badges = [o.type, o.comune]
-        .filter(Boolean)
-        .map((b) => `<span class="badge">${escHl(b)}</span>`)
-        .join("");
-
-    const addr = [
-        o.address,
-        o.frazione && "fraz. " + o.frazione,
-        [o.cap, o.comune].filter(Boolean).join(" "),
-        o.province && o.province !== o.comune ? "(" + o.province + ")" : "",
-        o.country,
-    ].filter(Boolean).join(", ");
-
-    const mapsQuery = encodeURIComponent([o.address, o.cap, o.comune, o.province, o.country].filter(Boolean).join(", "));
-
-    const actions = [
-        o.url && `<a class="action primary" href="${esc(o.url)}" target="_blank" rel="noopener">Apri offerta ↗</a>`,
-        o.web && `<a class="action" href="${esc(webHref(o.web))}" target="_blank" rel="noopener">Sito web ↗</a>`,
-        addr && `<a class="action" href="https://www.google.com/maps/search/?api=1&query=${mapsQuery}" target="_blank" rel="noopener">Mappa ↗</a>`,
+    const isBookmarked = Bookmarks.has(o.id);
+    
+    const sectors = o.sectors ? `<p class="prose dim card-sectors">${escHl(o.sectors)}</p>` : "";
+    
+    let hasMore = false;
+    const fullText = (o.description + "\\n\\n" + o.note).trim();
+    if (fullText.length > 300) hasMore = true;
+    
+    const locationStr = [o.comune, o.province && o.province !== o.comune ? o.province : ""].filter(Boolean).join(" - ").toUpperCase();
+    
+    const metaRows = [
+        locationStr && `<div class="meta-row"><svg viewBox="0 0 24 24" class="meta-icon"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z"/></svg>${escHl(locationStr)}</div>`,
+        o.email && `<div class="meta-row"><svg viewBox="0 0 24 24" class="meta-icon"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg><a href="mailto:${esc(o.email)}">${escHl(o.email)}</a></div>`
     ].filter(Boolean).join("");
 
-    const contactRows = [
-        infoRow("Referente", o.referent && escHl(o.referent)),
-        infoRow("Telefono", o.phone && `<a href="tel:${esc(o.phone.replace(/\s+/g, ""))}">${escHl(o.phone)}</a>`),
-        infoRow("Email", o.email && `<a href="mailto:${esc(o.email)}">${escHl(o.email)}</a>`),
-        infoRow("Sito web", o.web && `<a href="${esc(webHref(o.web))}" target="_blank" rel="noopener">${escHl(o.web)}</a>`),
-        infoRow("Indirizzo", addr && escHl(addr)),
-    ].join("");
-
-    return `<article class="card" id="offer-${esc(o.id)}">
-        <h3 class="card-title">${escHl(o.company)}</h3>
-        <div class="badges">${badges}</div>
-        ${actions ? `<div class="actions">${actions}</div>` : ""}
-        ${section("Descrizione", expandableProse(o.description))}
-        ${section("Note sul tirocinio", expandableProse(o.note))}
-        ${section("Contatti", contactRows && `<dl class="info">${contactRows}</dl>`)}
-        ${section("Settori di attività", o.sectors && `<p class="prose dim">${escHl(o.sectors)}</p>`)}
+    return `<article class="card ${hasMore ? 'has-more' : ''}" id="offer-${esc(o.id)}">
+        <div class="card-layout">
+            <div class="card-col-left">
+                <div class="card-title-wrap">
+                    <h3 class="card-title">${escHl(o.company)}</h3>
+                    <button type="button" class="bookmark-btn ${isBookmarked ? 'active' : ''}" data-id="${esc(o.id)}" aria-label="Salva preferito" title="Salva nei preferiti">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2zm0 15l-5-2.18L7 18V5h10v13z" class="icon-outline"/><path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2z" class="icon-filled"/></svg>
+                    </button>
+                </div>
+                ${sectors}
+            </div>
+            
+            <div class="card-col-center">
+                <div class="card-desc">
+                    <div class="prose">${escHl(o.description)}</div>
+                    ${o.note ? `<div class="card-section-title mt-3">Note</div><div class="prose">${escHl(o.note)}</div>` : ''}
+                </div>
+                ${hasMore ? `<div class="show-more-wrap"><button type="button" class="show-more-btn pill-btn">Mostra tutto ⌄</button></div>` : ''}
+            </div>
+            
+            <div class="card-col-right">
+                <div class="meta-rows">${metaRows}</div>
+                ${o.url ? `<a class="details-link" href="${esc(o.url)}" target="_blank" rel="noopener">Vedi Dettagli &rarr;</a>` : ''}
+            </div>
+        </div>
     </article>`;
 }
 
@@ -340,66 +364,48 @@ function normalizeCurricular(rec, idx) {
 }
 
 function cardHTMLCurricular(o) {
-    const badges = [...o.cycles, o.tipoTirocinio, o.comune]
-        .filter(Boolean)
-        .map((b) => `<span class="badge">${escHl(b)}</span>`)
-        .join("");
-
-    const addr = [
-        o.address,
-        [o.comune].filter(Boolean).join(" "),
-        o.province && o.province !== o.comune ? "(" + o.province + ")" : "",
-        o.country,
-    ].filter(Boolean).join(", ");
-
-    const mapsQuery = encodeURIComponent([o.address, o.comune, o.province, o.country].filter(Boolean).join(", "));
-
-    const actions = [
-        o.url && `<a class="action primary" href="${esc(o.url)}" target="_blank" rel="noopener">Apri offerta ↗</a>`,
-        addr && `<a class="action" href="https://www.google.com/maps/search/?api=1&query=${mapsQuery}" target="_blank" rel="noopener">Mappa ↗</a>`,
+    const isBookmarked = Bookmarks.has(o.id);
+    
+    const corsiText = o.corsi.join(" • ");
+    const sectors = corsiText ? `<p class="prose dim card-sectors">${escHl(corsiText)}</p>` : "";
+    
+    let hasMore = false;
+    const fullText = (o.oggetto + "\\n" + o.obiettivi + "\\n" + o.attivita).trim();
+    if (fullText.length > 300) hasMore = true;
+    
+    const locationStr = [o.comune, o.province && o.province !== o.comune ? o.province : ""].filter(Boolean).join(" - ").toUpperCase();
+    
+    const metaRows = [
+        locationStr && `<div class="meta-row"><svg viewBox="0 0 24 24" class="meta-icon"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z"/></svg>${escHl(locationStr)}</div>`,
+        o.tutor && `<div class="meta-row"><svg viewBox="0 0 24 24" class="meta-icon"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>${escHl(o.tutor)}</div>`
     ].filter(Boolean).join("");
 
-    const descriptionPartsData = [
-        { text: o.oggetto, className: "prose" },
-        { text: o.obiettivi, className: "prose dim" },
-        { text: o.attivita, className: "prose dim" },
-    ];
-    const descriptionHtml = expandableProseParts(descriptionPartsData);
-
-    const requisiti = [
-        infoRow("Conoscenze/abilità", o.conoscenze && escHl(o.conoscenze)),
-        infoRow("Lingue richieste", o.linguistiche && escHl(o.linguistiche)),
-        infoRow("Informatica richiesta", o.informatiche && escHl(o.informatiche)),
-    ].join("");
-
-    const dettagli = [
-        infoRow("Durata", o.durata && escHl(o.durata)),
-        infoRow("Tirocinanti", o.numTirocinanti && escHl(o.numTirocinanti)),
-        infoRow("Inizio previsto", o.dataInizio && escHl(o.dataInizio)),
-        infoRow("Fine prevista", o.dataFine && escHl(o.dataFine)),
-        infoRow("Indennità/borsa", o.indennita && escHl(o.indennita)),
-        infoRow("Scadenza domanda", o.dataScadenza && escHl(o.dataScadenza)),
-        infoRow("Struttura", o.struttura && escHl(o.struttura)),
-    ].join("");
-
-    const contactRows = [
-        infoRow("Tutor", o.tutor && escHl(o.tutor)),
-        infoRow("Ruolo tutor", o.tutorRuolo && escHl(o.tutorRuolo)),
-        infoRow("Indirizzo", addr && escHl(addr)),
-    ].join("");
-
-    const corsiBadges = o.corsi.map((c) => `<span class="badge">${escHl(c)}</span>`).join("");
-
-    return `<article class="card" id="offer-${esc(o.id)}">
-        <h3 class="card-title">${escHl(o.company)}</h3>
-        <div class="badges">${badges}</div>
-        ${actions ? `<div class="actions">${actions}</div>` : ""}
-        ${section("Descrizione", descriptionHtml)}
-        ${section("Note sul tirocinio", expandableProse(o.note))}
-        ${section("Requisiti", requisiti && `<dl class="info">${requisiti}</dl>`)}
-        ${section("Dettagli tirocinio", dettagli && `<dl class="info">${dettagli}</dl>`)}
-        ${section("Contatti", contactRows && `<dl class="info">${contactRows}</dl>`)}
-        ${section("Corsi di laurea", corsiBadges && `<div class="badges">${corsiBadges}</div>`)}
+    return `<article class="card ${hasMore ? 'has-more' : ''}" id="offer-${esc(o.id)}">
+        <div class="card-layout">
+            <div class="card-col-left">
+                <div class="card-title-wrap">
+                    <h3 class="card-title">${escHl(o.company)}</h3>
+                    <button type="button" class="bookmark-btn ${isBookmarked ? 'active' : ''}" data-id="${esc(o.id)}" aria-label="Salva preferito" title="Salva nei preferiti">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2zm0 15l-5-2.18L7 18V5h10v13z" class="icon-outline"/><path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2z" class="icon-filled"/></svg>
+                    </button>
+                </div>
+                ${sectors}
+            </div>
+            
+            <div class="card-col-center">
+                <div class="card-desc">
+                    ${o.oggetto ? `<div class="prose">${escHl(o.oggetto)}</div>` : ''}
+                    ${o.obiettivi ? `<div class="card-section-title mt-3">Obiettivi</div><div class="prose">${escHl(o.obiettivi)}</div>` : ''}
+                    ${o.attivita ? `<div class="card-section-title mt-3">Attività</div><div class="prose">${escHl(o.attivita)}</div>` : ''}
+                </div>
+                ${hasMore ? `<div class="show-more-wrap"><button type="button" class="show-more-btn pill-btn">Mostra tutto ⌄</button></div>` : ''}
+            </div>
+            
+            <div class="card-col-right">
+                <div class="meta-rows">${metaRows}</div>
+                ${o.url ? `<a class="details-link" href="${esc(o.url)}" target="_blank" rel="noopener">Vedi Dettagli &rarr;</a>` : ''}
+            </div>
+        </div>
     </article>`;
 }
 
@@ -410,25 +416,16 @@ const TYPE_CONFIGS = {
         dataUrl: RAW_BASE + "extracurricular_internship_log.json",
         normalize: normalizeExtra,
         cardHTML: cardHTMLExtra,
-        categoryLabel: "Tipo azienda/ente",
-        otherFilters: [
-            { key: "onlyNote", label: "Solo con note", test: (o) => !!o.note },
-            { key: "onlyWeb", label: "Solo con sito web", test: (o) => !!o.web },
-            { key: "onlyEmail", label: "Solo con email", test: (o) => !!o.email },
-        ],
+        categoryLabel: "Tutti i settori",
+        otherFilters: [],
     },
     curricular: {
         label: "Curriculari",
         dataUrl: RAW_BASE + "curricular_internship_log.json",
         normalize: normalizeCurricular,
         cardHTML: cardHTMLCurricular,
-        categoryLabel: "Corso di laurea",
-        otherFilters: [
-            { key: "onlyTriennale", label: "Solo laurea triennale", test: (o) => o.cycles.some((c) => /triennal/i.test(c)) },
-            { key: "onlyMagistrale", label: "Solo laurea magistrale", test: (o) => o.cycles.some((c) => /magistral/i.test(c)) },
-            { key: "onlyNote", label: "Solo con note", test: (o) => !!o.note },
-            { key: "onlyIndennita", label: "Solo con indennità/borsa", test: (o) => o.indennitaBool },
-        ],
+        categoryLabel: "Tutti i corsi",
+        otherFilters: [],
     },
 };
 
@@ -441,7 +438,9 @@ const SORT_OPTIONS = [
 
 function freshTypeState(cfg) {
     const other = {};
-    for (const f of cfg.otherFilters) other[f.key] = false;
+    if (cfg.otherFilters) {
+        for (const f of cfg.otherFilters) other[f.key] = false;
+    }
     return {
         loaded: false,
         error: null,
@@ -455,6 +454,7 @@ function freshTypeState(cfg) {
         comune: "",
         comuneSearch: "",
         other,
+        onlyBookmarks: false,
     };
 }
 
@@ -480,8 +480,11 @@ function applyFilters() {
     let list = s.all.filter((o) => {
         if (s.categories.size && !o.categories.some((c) => s.categories.has(c))) return false;
         if (s.comune && o.comune !== s.comune) return false;
-        for (const f of cfg.otherFilters) {
-            if (s.other[f.key] && !f.test(o)) return false;
+        if (s.onlyBookmarks && !Bookmarks.has(o.id)) return false;
+        if (cfg.otherFilters) {
+            for (const f of cfg.otherFilters) {
+                if (s.other[f.key] && !f.test(o)) return false;
+            }
         }
         if (tokens.length && !tokens.every((t) => o.haystack.includes(t))) return false;
         return true;
@@ -564,9 +567,10 @@ function buildFilterControls() {
         .join("");
     comuneSelect.value = s.comune;
 
-    document.getElementById("other-checks").innerHTML = cfg.otherFilters
-        .map((f) => `<label class="check"><input type="checkbox" data-key="${esc(f.key)}" ${s.other[f.key] ? "checked" : ""}> <span>${esc(f.label)}</span></label>`)
-        .join("");
+    const bookmarkToggle = document.getElementById("only-bookmarks");
+    if (bookmarkToggle) {
+        bookmarkToggle.checked = !!s.onlyBookmarks;
+    }
 
     document.getElementById("search").value = s.search;
     document.getElementById("sort").innerHTML = SORT_OPTIONS
@@ -612,29 +616,31 @@ function wireEvents() {
         applyFilters();
     });
 
-    document.getElementById("other-checks").addEventListener("change", (e) => {
-        const cb = e.target;
-        if (!cb.matches("input[type=checkbox]")) return;
-        currentState().other[cb.dataset.key] = cb.checked;
-        applyFilters();
-    });
+    const onlyBookmarksToggle = document.getElementById("only-bookmarks");
+    if (onlyBookmarksToggle) {
+        onlyBookmarksToggle.addEventListener("change", (e) => {
+            currentState().onlyBookmarks = e.target.checked;
+            applyFilters();
+        });
+    }
 
     document.getElementById("card-grid").addEventListener("click", (e) => {
-        if (e.target.matches(".show-more-btn")) {
-            const btn = e.target;
-            const expandable = btn.closest(".expandable");
-            const summary = expandable.querySelector(".summary");
-            const full = expandable.querySelector(".full");
-            
-            if (full.hidden) {
-                full.hidden = false;
-                summary.hidden = true;
-                btn.textContent = "Mostra meno";
-            } else {
-                full.hidden = true;
-                summary.hidden = false;
-                btn.textContent = "Mostra altro";
+        const bookmarkBtn = e.target.closest(".bookmark-btn");
+        if (bookmarkBtn) {
+            const id = bookmarkBtn.dataset.id;
+            const isNowBookmarked = Bookmarks.toggle(id);
+            bookmarkBtn.classList.toggle("active", isNowBookmarked);
+            if (currentState().onlyBookmarks && !isNowBookmarked) {
+                applyFilters();
             }
+            return;
+        }
+
+        const showMoreBtn = e.target.closest(".show-more-btn");
+        if (showMoreBtn) {
+            const card = showMoreBtn.closest(".card");
+            card.classList.toggle("expanded");
+            showMoreBtn.innerHTML = card.classList.contains("expanded") ? "Mostra meno &#8963;" : "Mostra tutto &#8964;";
         }
     });
 
