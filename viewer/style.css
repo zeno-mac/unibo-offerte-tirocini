@@ -104,6 +104,17 @@ mark {
 .search input::placeholder { color: var(--text-faint); }
 .search input:focus { border-color: var(--accent-border); background: var(--panel-3); }
 
+/* ---------- Warning Banner ---------- */
+.warning-banner {
+    background: rgba(255, 170, 0, 0.1);
+    color: #ffb833;
+    padding: 10px 18px;
+    font-size: 13px;
+    text-align: center;
+    border-bottom: 1px solid rgba(255, 170, 0, 0.2);
+    font-weight: 500;
+}
+
 /* ---------- Type tabs ---------- */
 .type-tabs {
     flex: none;
