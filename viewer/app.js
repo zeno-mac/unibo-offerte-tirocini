@@ -144,6 +144,27 @@ function keyedRecord(rec) {
     return m;
 }
 
+/* ================= Bookmarks ================= */
+const Bookmarks = {
+    get: function() {
+        try {
+            return new Set(JSON.parse(localStorage.getItem('offerte_bookmarks') || '[]'));
+        } catch(e) {
+            return new Set();
+        }
+    },
+    toggle: function(id) {
+        const b = this.get();
+        if (b.has(id)) b.delete(id);
+        else b.add(id);
+        localStorage.setItem('offerte_bookmarks', JSON.stringify([...b]));
+        return b.has(id);
+    },
+    has: function(id) {
+        return this.get().has(id);
+    }
+};
+
 /* ================= Extracurricular ================= */
 const EXTRA_FIELDS = {
     url: "Indirizzo dell'offerta:",
@@ -165,6 +186,22 @@ const EXTRA_FIELDS = {
     note: "Note:",
 };
 
+function parseSectors(s) {
+    if (!s) return [];
+    const parts = String(s).split(/\s+(?=[A-ZÀ-Ú])/);
+    const merged = [];
+    for (const part of parts) {
+        const p = part.trim();
+        if (!p) continue;
+        if (/^(Industriale|Residenziale|Commerciale|Istituti)/.test(p) && merged.length > 0) {
+            merged[merged.length - 1] += " " + p;
+        } else {
+            merged.push(p);
+        }
+    }
+    return merged;
+}
+
 function normalizeExtra(rec, idx) {
     const r = keyedRecord(rec);
     const url = r[EXTRA_FIELDS.url] || "";
@@ -178,7 +215,7 @@ function normalizeExtra(rec, idx) {
         company: cleanCompany(r[EXTRA_FIELDS.company]),
         type: fixText(r[EXTRA_FIELDS.type]),
         description: fixText(r[EXTRA_FIELDS.description]),
-        sectors: fixText(r[EXTRA_FIELDS.sectors]),
+        sectors: parseSectors(fixText(r[EXTRA_FIELDS.sectors])),
         country: fixText(r[EXTRA_FIELDS.country]),
         province: fixText(r[EXTRA_FIELDS.province]),
         comune: fixText(r[EXTRA_FIELDS.comune]),
@@ -191,52 +228,66 @@ function normalizeExtra(rec, idx) {
         web: fixText(r[EXTRA_FIELDS.web]),
         note: fixText(r[EXTRA_FIELDS.note]),
     };
-    o.categories = o.type ? [o.type] : [];
+    o.categories = o.sectors;
     o.haystack = [
-        o.company, o.type, o.description, o.sectors,
+        o.company, o.type, o.description, o.sectors.join(" "),
         o.comune, o.frazione, o.address, o.referent, o.email, o.web, o.note,
     ].join("  ").toLowerCase();
     return o;
 }
 
 function cardHTMLExtra(o) {
-    const badges = [o.type, o.comune]
-        .filter(Boolean)
-        .map((b) => `<span class="badge">${escHl(b)}</span>`)
-        .join("");
+    const isBookmarked = Bookmarks.has(o.id);
+    
+    const sectorsText = o.sectors.join(" • ");
+    const sectors = sectorsText ? `<p class="prose dim card-sectors">${escHl(sectorsText)}</p>` : "";
+    
+    const s = typeof state !== "undefined" && state.activeType ? currentState() : null;
+    const tokens = s && s.search ? s.search.toLowerCase().split(/\s+/).filter(Boolean) : [];
 
-    const addr = [
-        o.address,
-        o.frazione && "fraz. " + o.frazione,
-        [o.cap, o.comune].filter(Boolean).join(" "),
-        o.province && o.province !== o.comune ? "(" + o.province + ")" : "",
-        o.country,
-    ].filter(Boolean).join(", ");
+    const locationStr = [o.comune, o.province && o.province !== o.comune ? o.province : ""].filter(Boolean).join(" - ").toUpperCase();
+    
+    const metaRowsArray = [
+        locationStr && `<div class="meta-row"><svg viewBox="0 0 24 24" class="meta-icon" title="Località"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z"/></svg>${escHl(locationStr)}</div>`,
+        o.address && `<div class="meta-row"><svg viewBox="0 0 24 24" class="meta-icon" title="Indirizzo"><path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z"/></svg>${escHl(o.address)}</div>`,
+        o.referent && `<div class="meta-row"><svg viewBox="0 0 24 24" class="meta-icon" title="Referente"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>${escHl(o.referent)}</div>`,
+        o.phone && `<div class="meta-row"><svg viewBox="0 0 24 24" class="meta-icon" title="Telefono"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg><a href="tel:${esc(o.phone)}">${escHl(o.phone)}</a></div>`,
+        o.email && `<div class="meta-row"><svg viewBox="0 0 24 24" class="meta-icon" title="Email"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg><a href="mailto:${esc(o.email)}">${escHl(o.email)}</a></div>`,
+        o.web && `<div class="meta-row"><svg viewBox="0 0 24 24" class="meta-icon" title="Sito web"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg><a href="${esc(webHref(o.web))}" target="_blank" rel="noopener">${escHl(o.web)}</a></div>`
+    ].filter(Boolean);
+    const metaRows = metaRowsArray.join("");
 
-    const mapsQuery = encodeURIComponent([o.address, o.cap, o.comune, o.province, o.country].filter(Boolean).join(", "));
+    let autoExpand = false;
+    const fullText = (o.description + "\n\n" + o.note).trim();
+    if (tokens.length > 0 && (tokens.some(t => fullText.toLowerCase().includes(t)) || tokens.some(t => sectorsText.toLowerCase().includes(t)))) {
+        autoExpand = true;
+    }
 
-    const actions = [
-        o.url && `<a class="action primary" href="${esc(o.url)}" target="_blank" rel="noopener">Apri offerta ↗</a>`,
-        o.web && `<a class="action" href="${esc(webHref(o.web))}" target="_blank" rel="noopener">Sito web ↗</a>`,
-        addr && `<a class="action" href="https://www.google.com/maps/search/?api=1&query=${mapsQuery}" target="_blank" rel="noopener">Mappa ↗</a>`,
-    ].filter(Boolean).join("");
-
-    const contactRows = [
-        infoRow("Referente", o.referent && escHl(o.referent)),
-        infoRow("Telefono", o.phone && `<a href="tel:${esc(o.phone.replace(/\s+/g, ""))}">${escHl(o.phone)}</a>`),
-        infoRow("Email", o.email && `<a href="mailto:${esc(o.email)}">${escHl(o.email)}</a>`),
-        infoRow("Sito web", o.web && `<a href="${esc(webHref(o.web))}" target="_blank" rel="noopener">${escHl(o.web)}</a>`),
-        infoRow("Indirizzo", addr && escHl(addr)),
-    ].join("");
-
-    return `<article class="card" id="offer-${esc(o.id)}">
-        <h3 class="card-title">${escHl(o.company)}</h3>
-        <div class="badges">${badges}</div>
-        ${actions ? `<div class="actions">${actions}</div>` : ""}
-        ${section("Descrizione", expandableProse(o.description))}
-        ${section("Note sul tirocinio", expandableProse(o.note))}
-        ${section("Contatti", contactRows && `<dl class="info">${contactRows}</dl>`)}
-        ${section("Settori di attività", o.sectors && `<p class="prose dim">${escHl(o.sectors)}</p>`)}
+    return `<article class="card has-more ${autoExpand ? 'expanded' : ''}" id="offer-${esc(o.id)}">
+        <div class="card-layout">
+            <div class="card-col-left">
+                <div class="card-title-wrap">
+                    <h3 class="card-title">${escHl(o.company)}</h3>
+                    <button type="button" class="bookmark-btn ${isBookmarked ? 'active' : ''}" data-id="${esc(o.id)}" aria-label="Salva preferito" title="Salva nei preferiti">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2zm0 15l-5-2.18L7 18V5h10v13z" class="icon-outline"/><path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2z" class="icon-filled"/></svg>
+                    </button>
+                </div>
+                ${sectors}
+            </div>
+            
+            <div class="card-col-center">
+                <div class="card-desc">
+                    <div class="prose">${escHl(o.description)}</div>
+                    ${o.note ? `<div class="card-section-title mt-3">Note</div><div class="prose">${escHl(o.note)}</div>` : ''}
+                </div>
+                <div class="show-more-wrap"><button type="button" class="show-more-btn pill-btn">${autoExpand ? 'Mostra meno &#8963;' : 'Mostra tutto &#8964;'}</button></div>
+            </div>
+            
+            <div class="card-col-right">
+                <div class="meta-rows">${metaRows}</div>
+                ${o.url ? `<a class="details-link" href="${esc(o.url)}" target="_blank" rel="noopener">Apri offerta &nearr;</a>` : ''}
+            </div>
+        </div>
     </article>`;
 }
 
@@ -311,7 +362,7 @@ function normalizeCurricular(rec, idx) {
         attivita: fixText(r[CURR_FIELDS.attivita]),
         conoscenze: fixText(r[CURR_FIELDS.conoscenze]),
         numTirocinanti: fixText(r[CURR_FIELDS.numTirocinanti]),
-        durata: fixText(r[CURR_FIELDS.durata]),
+        durata: fixText(r[CURR_FIELDS.durata]) === "(Ore)" ? "" : fixText(r[CURR_FIELDS.durata]),
         dataInizio: fixText(r[CURR_FIELDS.dataInizio]),
         dataFine: fixText(r[CURR_FIELDS.dataFine]),
         country: fixText(r[CURR_FIELDS.country]),
@@ -340,66 +391,61 @@ function normalizeCurricular(rec, idx) {
 }
 
 function cardHTMLCurricular(o) {
-    const badges = [...o.cycles, o.tipoTirocinio, o.comune]
-        .filter(Boolean)
-        .map((b) => `<span class="badge">${escHl(b)}</span>`)
-        .join("");
+    const isBookmarked = Bookmarks.has(o.id);
+    
+    const corsiText = o.corsi.join(" • ");
+    const sectors = corsiText ? `<p class="prose dim card-sectors">${escHl(corsiText)}</p>` : "";
+    
+    const s = typeof state !== "undefined" && state.activeType ? currentState() : null;
+    const tokens = s && s.search ? s.search.toLowerCase().split(/\s+/).filter(Boolean) : [];
 
-    const addr = [
-        o.address,
-        [o.comune].filter(Boolean).join(" "),
-        o.province && o.province !== o.comune ? "(" + o.province + ")" : "",
-        o.country,
-    ].filter(Boolean).join(", ");
+    const locationStr = [o.comune, o.province && o.province !== o.comune ? o.province : ""].filter(Boolean).join(" - ").toUpperCase();
+    
+    const metaRowsArray = [
+        o.tipoTirocinio && `<div class="meta-row"><svg viewBox="0 0 24 24" class="meta-icon" title="Tipologia"><path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/></svg>${escHl(o.tipoTirocinio)}</div>`,
+        locationStr && `<div class="meta-row"><svg viewBox="0 0 24 24" class="meta-icon" title="Località"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z"/></svg>${escHl(locationStr)}</div>`,
+        o.address && `<div class="meta-row"><svg viewBox="0 0 24 24" class="meta-icon" title="Indirizzo"><path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z"/></svg>${escHl(o.address)}</div>`,
+        o.tutor && `<div class="meta-row"><svg viewBox="0 0 24 24" class="meta-icon" title="Tutor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>${escHl(o.tutor)}</div>`,
+        o.numTirocinanti && `<div class="meta-row"><svg viewBox="0 0 24 24" class="meta-icon" title="Numero tirocinanti"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>${escHl(o.numTirocinanti)} posti</div>`,
+        o.durata && `<div class="meta-row"><svg viewBox="0 0 24 24" class="meta-icon" title="Durata"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>${escHl(o.durata)}</div>`,
+        o.dataScadenza && `<div class="meta-row"><svg viewBox="0 0 24 24" class="meta-icon" title="Scadenza"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>Scade il ${escHl(o.dataScadenza)}</div>`
+    ].filter(Boolean);
+    const metaRows = metaRowsArray.join("");
 
-    const mapsQuery = encodeURIComponent([o.address, o.comune, o.province, o.country].filter(Boolean).join(", "));
+    let autoExpand = false;
+    const fullText = (o.oggetto + "\n" + o.obiettivi + "\n" + o.attivita + "\n" + o.conoscenze + "\n" + o.note).trim();
+    if (tokens.length > 0 && (tokens.some(t => fullText.toLowerCase().includes(t)) || tokens.some(t => corsiText.toLowerCase().includes(t)))) {
+        autoExpand = true;
+    }
 
-    const actions = [
-        o.url && `<a class="action primary" href="${esc(o.url)}" target="_blank" rel="noopener">Apri offerta ↗</a>`,
-        addr && `<a class="action" href="https://www.google.com/maps/search/?api=1&query=${mapsQuery}" target="_blank" rel="noopener">Mappa ↗</a>`,
-    ].filter(Boolean).join("");
-
-    const descriptionPartsData = [
-        { text: o.oggetto, className: "prose" },
-        { text: o.obiettivi, className: "prose dim" },
-        { text: o.attivita, className: "prose dim" },
-    ];
-    const descriptionHtml = expandableProseParts(descriptionPartsData);
-
-    const requisiti = [
-        infoRow("Conoscenze/abilità", o.conoscenze && escHl(o.conoscenze)),
-        infoRow("Lingue richieste", o.linguistiche && escHl(o.linguistiche)),
-        infoRow("Informatica richiesta", o.informatiche && escHl(o.informatiche)),
-    ].join("");
-
-    const dettagli = [
-        infoRow("Durata", o.durata && escHl(o.durata)),
-        infoRow("Tirocinanti", o.numTirocinanti && escHl(o.numTirocinanti)),
-        infoRow("Inizio previsto", o.dataInizio && escHl(o.dataInizio)),
-        infoRow("Fine prevista", o.dataFine && escHl(o.dataFine)),
-        infoRow("Indennità/borsa", o.indennita && escHl(o.indennita)),
-        infoRow("Scadenza domanda", o.dataScadenza && escHl(o.dataScadenza)),
-        infoRow("Struttura", o.struttura && escHl(o.struttura)),
-    ].join("");
-
-    const contactRows = [
-        infoRow("Tutor", o.tutor && escHl(o.tutor)),
-        infoRow("Ruolo tutor", o.tutorRuolo && escHl(o.tutorRuolo)),
-        infoRow("Indirizzo", addr && escHl(addr)),
-    ].join("");
-
-    const corsiBadges = o.corsi.map((c) => `<span class="badge">${escHl(c)}</span>`).join("");
-
-    return `<article class="card" id="offer-${esc(o.id)}">
-        <h3 class="card-title">${escHl(o.company)}</h3>
-        <div class="badges">${badges}</div>
-        ${actions ? `<div class="actions">${actions}</div>` : ""}
-        ${section("Descrizione", descriptionHtml)}
-        ${section("Note sul tirocinio", expandableProse(o.note))}
-        ${section("Requisiti", requisiti && `<dl class="info">${requisiti}</dl>`)}
-        ${section("Dettagli tirocinio", dettagli && `<dl class="info">${dettagli}</dl>`)}
-        ${section("Contatti", contactRows && `<dl class="info">${contactRows}</dl>`)}
-        ${section("Corsi di laurea", corsiBadges && `<div class="badges">${corsiBadges}</div>`)}
+    return `<article class="card has-more ${autoExpand ? 'expanded' : ''}" id="offer-${esc(o.id)}">
+        <div class="card-layout">
+            <div class="card-col-left">
+                <div class="card-title-wrap">
+                    <h3 class="card-title">${escHl(o.company)}</h3>
+                    <button type="button" class="bookmark-btn ${isBookmarked ? 'active' : ''}" data-id="${esc(o.id)}" aria-label="Salva preferito" title="Salva nei preferiti">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2zm0 15l-5-2.18L7 18V5h10v13z" class="icon-outline"/><path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2z" class="icon-filled"/></svg>
+                    </button>
+                </div>
+                ${sectors}
+            </div>
+            
+            <div class="card-col-center">
+                <div class="card-desc">
+                    ${o.oggetto ? `<div class="prose">${escHl(o.oggetto)}</div>` : ''}
+                    ${o.obiettivi ? `<div class="card-section-title mt-3">Obiettivi</div><div class="prose">${escHl(o.obiettivi)}</div>` : ''}
+                    ${o.attivita ? `<div class="card-section-title mt-3">Attività</div><div class="prose">${escHl(o.attivita)}</div>` : ''}
+                    ${o.conoscenze ? `<div class="card-section-title mt-3">Conoscenze richieste</div><div class="prose">${escHl(o.conoscenze)}</div>` : ''}
+                    ${o.note ? `<div class="card-section-title mt-3">Note</div><div class="prose">${escHl(o.note)}</div>` : ''}
+                </div>
+                <div class="show-more-wrap"><button type="button" class="show-more-btn pill-btn">${autoExpand ? 'Mostra meno &#8963;' : 'Mostra tutto &#8964;'}</button></div>
+            </div>
+            
+            <div class="card-col-right">
+                <div class="meta-rows">${metaRows}</div>
+                ${o.url ? `<a class="details-link" href="${esc(o.url)}" target="_blank" rel="noopener">Apri offerta &nearr;</a>` : ''}
+            </div>
+        </div>
     </article>`;
 }
 
@@ -410,25 +456,16 @@ const TYPE_CONFIGS = {
         dataUrl: RAW_BASE + "extracurricular_internship_log.json",
         normalize: normalizeExtra,
         cardHTML: cardHTMLExtra,
-        categoryLabel: "Tipo azienda/ente",
-        otherFilters: [
-            { key: "onlyNote", label: "Solo con note", test: (o) => !!o.note },
-            { key: "onlyWeb", label: "Solo con sito web", test: (o) => !!o.web },
-            { key: "onlyEmail", label: "Solo con email", test: (o) => !!o.email },
-        ],
+        categoryLabel: "Tutti i settori",
+        otherFilters: [],
     },
     curricular: {
         label: "Curriculari",
         dataUrl: RAW_BASE + "curricular_internship_log.json",
         normalize: normalizeCurricular,
         cardHTML: cardHTMLCurricular,
-        categoryLabel: "Corso di laurea",
-        otherFilters: [
-            { key: "onlyTriennale", label: "Solo laurea triennale", test: (o) => o.cycles.some((c) => /triennal/i.test(c)) },
-            { key: "onlyMagistrale", label: "Solo laurea magistrale", test: (o) => o.cycles.some((c) => /magistral/i.test(c)) },
-            { key: "onlyNote", label: "Solo con note", test: (o) => !!o.note },
-            { key: "onlyIndennita", label: "Solo con indennità/borsa", test: (o) => o.indennitaBool },
-        ],
+        categoryLabel: "Tutti i corsi",
+        otherFilters: [],
     },
 };
 
@@ -441,7 +478,9 @@ const SORT_OPTIONS = [
 
 function freshTypeState(cfg) {
     const other = {};
-    for (const f of cfg.otherFilters) other[f.key] = false;
+    if (cfg.otherFilters) {
+        for (const f of cfg.otherFilters) other[f.key] = false;
+    }
     return {
         loaded: false,
         error: null,
@@ -455,6 +494,7 @@ function freshTypeState(cfg) {
         comune: "",
         comuneSearch: "",
         other,
+        onlyBookmarks: false,
     };
 }
 
@@ -480,8 +520,11 @@ function applyFilters() {
     let list = s.all.filter((o) => {
         if (s.categories.size && !o.categories.some((c) => s.categories.has(c))) return false;
         if (s.comune && o.comune !== s.comune) return false;
-        for (const f of cfg.otherFilters) {
-            if (s.other[f.key] && !f.test(o)) return false;
+        if (s.onlyBookmarks && !Bookmarks.has(o.id)) return false;
+        if (cfg.otherFilters) {
+            for (const f of cfg.otherFilters) {
+                if (s.other[f.key] && !f.test(o)) return false;
+            }
         }
         if (tokens.length && !tokens.every((t) => o.haystack.includes(t))) return false;
         return true;
@@ -536,6 +579,30 @@ function renderCards() {
     }
     notice.hidden = true;
     grid.innerHTML = s.filtered.map(cfg.cardHTML).join("");
+
+    const cards = grid.querySelectorAll('.card.has-more');
+    for (let i = 0; i < cards.length; i++) {
+        const card = cards[i];
+        const wasExpanded = card.classList.contains('expanded');
+        if (wasExpanded) card.classList.remove('expanded');
+        
+        const desc = card.querySelector('.card-desc');
+        const sectors = card.querySelector('.card-sectors');
+        const metaRows = card.querySelector('.meta-rows');
+        
+        let isOverflowing = false;
+        if (desc && desc.scrollHeight > desc.clientHeight + 2) isOverflowing = true;
+        if (sectors && sectors.scrollHeight > sectors.clientHeight + 2) isOverflowing = true;
+        if (metaRows && metaRows.scrollHeight > metaRows.clientHeight + 2) isOverflowing = true;
+        
+        if (!isOverflowing) {
+            card.classList.remove('has-more');
+            const btn = card.querySelector('.show-more-wrap');
+            if (btn) btn.style.display = 'none';
+        } else if (wasExpanded) {
+            card.classList.add('expanded');
+        }
+    }
 }
 
 /* ---------- Filter controls ---------- */
@@ -564,9 +631,10 @@ function buildFilterControls() {
         .join("");
     comuneSelect.value = s.comune;
 
-    document.getElementById("other-checks").innerHTML = cfg.otherFilters
-        .map((f) => `<label class="check"><input type="checkbox" data-key="${esc(f.key)}" ${s.other[f.key] ? "checked" : ""}> <span>${esc(f.label)}</span></label>`)
-        .join("");
+    const bookmarkToggle = document.getElementById("only-bookmarks");
+    if (bookmarkToggle) {
+        bookmarkToggle.checked = !!s.onlyBookmarks;
+    }
 
     document.getElementById("search").value = s.search;
     document.getElementById("sort").innerHTML = SORT_OPTIONS
@@ -585,6 +653,13 @@ function refreshTypeUI() {
 
 /* ---------- Events ---------- */
 function wireEvents() {
+    const mobileFiltersBtn = document.getElementById("mobile-filters-btn");
+    const filterBar = document.getElementById("filter-bar");
+    if (mobileFiltersBtn && filterBar) {
+        mobileFiltersBtn.addEventListener("click", () => {
+            filterBar.classList.toggle("open");
+        });
+    }
     const searchInput = document.getElementById("search");
     let t;
     searchInput.addEventListener("input", () => {
@@ -612,29 +687,31 @@ function wireEvents() {
         applyFilters();
     });
 
-    document.getElementById("other-checks").addEventListener("change", (e) => {
-        const cb = e.target;
-        if (!cb.matches("input[type=checkbox]")) return;
-        currentState().other[cb.dataset.key] = cb.checked;
-        applyFilters();
-    });
+    const onlyBookmarksToggle = document.getElementById("only-bookmarks");
+    if (onlyBookmarksToggle) {
+        onlyBookmarksToggle.addEventListener("change", (e) => {
+            currentState().onlyBookmarks = e.target.checked;
+            applyFilters();
+        });
+    }
 
     document.getElementById("card-grid").addEventListener("click", (e) => {
-        if (e.target.matches(".show-more-btn")) {
-            const btn = e.target;
-            const expandable = btn.closest(".expandable");
-            const summary = expandable.querySelector(".summary");
-            const full = expandable.querySelector(".full");
-            
-            if (full.hidden) {
-                full.hidden = false;
-                summary.hidden = true;
-                btn.textContent = "Mostra meno";
-            } else {
-                full.hidden = true;
-                summary.hidden = false;
-                btn.textContent = "Mostra altro";
+        const bookmarkBtn = e.target.closest(".bookmark-btn");
+        if (bookmarkBtn) {
+            const id = bookmarkBtn.dataset.id;
+            const isNowBookmarked = Bookmarks.toggle(id);
+            bookmarkBtn.classList.toggle("active", isNowBookmarked);
+            if (currentState().onlyBookmarks && !isNowBookmarked) {
+                applyFilters();
             }
+            return;
+        }
+
+        const showMoreBtn = e.target.closest(".show-more-btn");
+        if (showMoreBtn) {
+            const card = showMoreBtn.closest(".card");
+            card.classList.toggle("expanded");
+            showMoreBtn.innerHTML = card.classList.contains("expanded") ? "Mostra meno &#8963;" : "Mostra tutto &#8964;";
         }
     });
 
