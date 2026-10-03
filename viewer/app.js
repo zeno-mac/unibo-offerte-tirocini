@@ -66,70 +66,7 @@ function webHref(w) {
     return /^https?:\/\//i.test(w) ? w : "https://" + w.replace(/^\/+/, "");
 }
 
-function infoRow(label, valueHtml) {
-    return valueHtml ? `<dt>${esc(label)}</dt><dd>${valueHtml}</dd>` : "";
-}
 
-function section(title, innerHtml) {
-    return innerHtml ? `<div class="card-section"><h4>${esc(title)}</h4>${innerHtml}</div>` : "";
-}
-
-const MAX_TEXT_LENGTH = 300;
-
-function expandableProse(text, className = "prose", maxLen = MAX_TEXT_LENGTH) {
-    if (!text) return "";
-    
-    const s = typeof state !== "undefined" && state.activeType ? currentState() : null;
-    const tokens = s && s.search ? s.search.toLowerCase().split(/\s+/).filter(Boolean) : [];
-    const hasMatch = tokens.length > 0 && tokens.some(t => text.toLowerCase().includes(t));
-
-    if (text.length <= maxLen) return `<p class="${className}">${escHl(text)}</p>`;
-    
-    const short = text.slice(0, maxLen).trim() + "…";
-    const isExpanded = hasMatch;
-
-    return `<div class="expandable">
-        <div class="summary" ${isExpanded ? 'hidden' : ''}><p class="${className}">${escHl(short)}</p></div>
-        <div class="full" ${isExpanded ? '' : 'hidden'}><p class="${className}">${escHl(text)}</p></div>
-        <button type="button" class="show-more-btn link-btn">${isExpanded ? 'Mostra meno' : 'Mostra altro'}</button>
-    </div>`;
-}
-
-function expandableProseParts(parts, maxLen = MAX_TEXT_LENGTH) {
-    const valid = parts.filter(p => p.text);
-    if (!valid.length) return "";
-    
-    const s = typeof state !== "undefined" && state.activeType ? currentState() : null;
-    const tokens = s && s.search ? s.search.toLowerCase().split(/\s+/).filter(Boolean) : [];
-    const hasMatch = tokens.length > 0 && valid.some(p => tokens.some(t => p.text.toLowerCase().includes(t)));
-
-    const totalLen = valid.reduce((acc, p) => acc + p.text.length, 0);
-    const fullHtml = valid.map(p => `<p class="${p.className}">${escHl(p.text)}</p>`).join("");
-    
-    if (totalLen <= maxLen) return fullHtml;
-    
-    let summaryHtml = "";
-    let len = 0;
-    for (const p of valid) {
-        if (len >= maxLen) break;
-        const rem = maxLen - len;
-        if (p.text.length <= rem) {
-            summaryHtml += `<p class="${p.className}">${escHl(p.text)}</p>`;
-            len += p.text.length;
-        } else {
-            summaryHtml += `<p class="${p.className}">${escHl(p.text.slice(0, rem).trim() + "…")}</p>`;
-            break;
-        }
-    }
-    
-    const isExpanded = hasMatch;
-
-    return `<div class="expandable">
-        <div class="summary" ${isExpanded ? 'hidden' : ''}>${summaryHtml}</div>
-        <div class="full" ${isExpanded ? '' : 'hidden'}>${fullHtml}</div>
-        <button type="button" class="show-more-btn link-btn">${isExpanded ? 'Mostra meno' : 'Mostra altro'}</button>
-    </div>`;
-}
 
 // Field labels scraped from the site sometimes carry embedded newlines/extra
 // spaces (an artifact of the source HTML markup). Look records up by a
@@ -457,7 +394,6 @@ const TYPE_CONFIGS = {
         normalize: normalizeExtra,
         cardHTML: cardHTMLExtra,
         categoryLabel: "Tutti i settori",
-        otherFilters: [],
     },
     curricular: {
         label: "Curriculari",
@@ -465,7 +401,6 @@ const TYPE_CONFIGS = {
         normalize: normalizeCurricular,
         cardHTML: cardHTMLCurricular,
         categoryLabel: "Tutti i corsi",
-        otherFilters: [],
     },
 };
 
@@ -477,10 +412,6 @@ const SORT_OPTIONS = [
 ];
 
 function freshTypeState(cfg) {
-    const other = {};
-    if (cfg.otherFilters) {
-        for (const f of cfg.otherFilters) other[f.key] = false;
-    }
     return {
         loaded: false,
         error: null,
@@ -489,11 +420,7 @@ function freshTypeState(cfg) {
         search: "",
         sort: "az",
         categories: new Set(),
-        categorySearch: "",
-        showAllCategories: false,
         comune: "",
-        comuneSearch: "",
-        other,
         onlyBookmarks: false,
     };
 }
@@ -522,11 +449,6 @@ function applyFilters() {
         if (s.categories.size && !o.categories.some((c) => s.categories.has(c))) return false;
         if (s.comune && o.comune !== s.comune) return false;
         if (s.onlyBookmarks && !Bookmarks.has(o.id)) return false;
-        if (cfg.otherFilters) {
-            for (const f of cfg.otherFilters) {
-                if (s.other[f.key] && !f.test(o)) return false;
-            }
-        }
         if (tokens.length && !tokens.every((t) => o.haystack.includes(t))) return false;
         return true;
     });
@@ -861,14 +783,7 @@ function wireEvents() {
         URL.revokeObjectURL(url);
     });
 
-    document.querySelectorAll(".filter-dropdown").forEach((dropdown) => {
-        dropdown.addEventListener("toggle", () => {
-            if (!dropdown.open) return;
-            document.querySelectorAll(".filter-dropdown").forEach((other) => {
-                if (other !== dropdown) other.open = false;
-            });
-        });
-    });
+
 
     let resizeTimer;
     window.addEventListener("resize", () => {
