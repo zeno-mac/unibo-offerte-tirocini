@@ -98,6 +98,38 @@
     ]
   },
   {
+    "Indirizzo dell'offerta:": "https://tirocini.unibo.it/tirocini/studenti/gestioneoffertetirocinio.htm?select=628905",
+    "Azienda/Ente:": "Associazione Mosaico di Solidarietà ODV",
+    "Tipologia di tirocinio:": "Tirocinio curriculare",
+    "Oggetto del tirocinio:": "Web Architecture, CMS Development & Data Analytics",
+    "Stabilimento/reparto/ufficio/scuola:": "Alta Frequenza web radio",
+    "Obiettivi formativi del tirocinio:": "consolidare e applicare le seguenti conoscenze:\r\n • Sviluppo web: uso dei linguaggi di programmazione web applicati ai CMS.\r\n• Modellazione dati: progettazione logica dei siti web e la gestione di database.\r\n• Infrastruttura di rete: gestione di hosting, protocolli FTP e flussi streaming.\r\n• Analytics e SEO:  implementazione sistemi di tracciamento dati e ottimizzazione sui motori di ricerca.\r\n• Lavoro in team: Sviluppare la capacità di collaborare in contesti lavorativi multidisciplinari e creativi.",
+    "Attività da svolgere in azienda/ente:": "•Aggiornamento tecnico del sito: Manutenzione del core del CMS, dei temi e dei plugin, con risoluzione di eventuali bug del codice.\r\n•Progettazione dell'architettura web: Riorganizzazione dell'alberatura del sito, dei menu e delle tassonomie (categorie e tag per articoli e podcast).\r\n•Gestione infrastruttura e database: Manutenzione del database (MySQL), gestione file tramite FTP e amministrazione del pannello hosting (cPanel).\r\n•Integrazione tracciamenti e SEO: Configurazione di strumenti di Web Analytics per il monitoraggio del traffico e ottimizzazione SEO strutturale.\r\n•Popolamento e collaudo: Caricamento dei contenuti sul sito come test finale per validare la stabilità e l'usabilità della struttura creata",
+    "Conoscenze teoriche e applicative, abilità trasversali (capacità organizzative, lavoro di gruppo, ecc) o obiettivi della classe di laurea:": "•Sviluppo Web: Conoscenza di HTML5, CSS3 e basi di PHP/JavaScript per modifiche al codice.\r\n•Gestione CMS: conoscenza di WordPress, dei relativi plugin e della struttura logica del sito.\r\n•Infrastruttura e DB: Nozioni di gestione database (MySQL), pannelli hosting (cPanel) e protocolli FTP.\r\n•Data & SEO: Utilizzo di strumenti di Web Analytics (Google Analytics) e tecniche di ottimizzazione SEO.\r\nInteresse per il settore: interesse per il mondo dei media, del podcasting, dello streaming audio e dell'associazionismo.\r\nAutonomia e Problem Solving: capacità di gestione autonoma del lavoro e spiccata attitudine al problem solving tecnico su bug o anomalie del sito.\r\n•Lavoro in team multidisciplinari: predisposizione al lavoro in un team creativo e dinamico, collaborando attivamente con figure non tecniche (affiancamento alla Social Media Strategist).\r\nComunicazione e organizzazione: capacità di tradurre le esigenze comunicative in soluzioni tecniche, rispettando le scadenze del calendario editoriale",
+    "Numero di tirocinanti:": "2",
+    "Durata:": "(Ore)",
+    "Data d'inizio prevista:": "20/11/2026",
+    "Data di fine prevista:": "28/05/2027",
+    "Nazione:": "ITALIA",
+    "Provincia:": "BOLOGNA",
+    "Comune:": "BOLOGNA",
+    "Indirizzo:": "Via del Monte 5",
+    "Sono previste indennità/rimborsi spese/borse di studio/premi:": "N",
+    "Data inizio pubblicazione:": "30/10/2026",
+    "Data di scadenza della pubblicazione:": "30/03/2027",
+    "Nome del tutor del soggetto ospitante:": "Martina",
+    "Cognome del tutor del soggetto ospitante:": "Bazzanella",
+    "Ruolo del tutor del soggetto ospitante:": "Social Media Manager - Comunicazione e Marketing Strategist",
+    "Eventuali conoscenze linguistiche richieste:": "",
+    "Eventuali conoscenze informatiche richieste:": "pacchetto office o equivalente",
+    "Note:": "il tirocinio potrebbe svolgersi in altre sedi e luoghi",
+    "Corsi:": [
+      "INFORMATICA (Laurea Triennale)",
+      "INGEGNERIA INFORMATICA (Laurea Triennale)",
+      "INGEGNERIA INFORMATICA (Laurea di secondo livello)"
+    ]
+  },
+  {
     "Indirizzo dell'offerta:": "https://tirocini.unibo.it/tirocini/studenti/gestioneoffertetirocinio.htm?select=618427",
     "Azienda/Ente:": "CNR - AREA TERRITORIALE DI RICERCA DI BOLOGNA",
     "Tipologia di tirocinio:": "Tirocinio curriculare",
@@ -373,37 +405,6 @@
       "INGEGNERIA ELETTRONICA E TELECOMUNICAZIONI PER L'ENERGIA (Laurea di secondo livello)",
       "INGEGNERIA ENERGETICA (Laurea di secondo livello)",
       "INGEGNERIA INFORMATICA (Laurea di secondo livello)"
-    ]
-  },
-  {
-    "Indirizzo dell'offerta:": "https://tirocini.unibo.it/tirocini/studenti/gestioneoffertetirocinio.htm?select=628933",
-    "Azienda/Ente:": "WHITE WALL S.R.L.",
-    "Tipologia di tirocinio:": "Tirocinio curriculare",
-    "Oggetto del tirocinio:": "Sistemi RTLS: Immersione nella Gestione di Progetti e nella Relazione con il Cliente",
-    "Stabilimento/reparto/ufficio/scuola:": "Uffici White Wall",
-    "Obiettivi formativi del tirocinio:": "- Acquisire una profonda conoscenza dei sistemi RTLS e delle loro applicazioni nel mondo reale.\r\n- Sviluppare competenze nella gestione di progetti, con particolare enfasi sulla pianificazione, il monitoraggio e la chiusura dei progetti.\r\n- Apprendere le tecniche di comunicazione efficace con i clienti e gestire le loro aspettative nel corso di un progetto.\r\n- Comprendere le dinamiche di lavoro all'interno di una società di sviluppo tecnologico, collaborando con team multidisciplinari.\r\n- Affinare le capacità decisionali e di problem solving in contesti reali e sotto pressione.",
-    "Attività da svolgere in azienda/ente:": "- Partecipare alle riunioni di kickoff del progetto per comprendere le esigenze del cliente e definire gli obiettivi del progetto.\r\n- Collaborare con il team tecnico per la stesura di un piano di progetto, inclusa la definizione di milestone, risorse necessarie e tempistiche.\r\n- Monitorare l'andamento del progetto, identificando eventuali deviazioni dal piano e proponendo soluzioni tempestive.\r\n- Interagire direttamente con i clienti, raccogliendo feedback, gestendo le aspettative e risolvendo eventuali problemi o incomprensioni.\r\n- Collaborare alla redazione di documentazione e report di avanzamento da presentare ai clienti.\r\n- Partecipare a corsi di formazione interni sull'uso e le potenzialità dei sistemi RTLS e sulle best practices nella gestione di progetti;\r\n- Partecipare alle attività di configurazione dell'hardware utilizzato",
-    "Conoscenze teoriche e applicative, abilità trasversali (capacità organizzative, lavoro di gruppo, ecc) o obiettivi della classe di laurea:": "- Fondamenti di Informatica e principi di base della programmazione.\r\n- Conoscenza di base dei sistemi RTLS e delle principali tecnologie ad essi associati.\r\n- Principi di gestione di progetto, possibilmente con qualche nozione delle principali metodologie (es. PMI, Agile, Scrum).\r\n- Tecniche di comunicazione efficace, sia scritta che verbale.\r\n- Fondamenti di customer relationship management (CRM) per gestire e tracciare le interazioni con i clienti.\r\n- Capacità di analisi critica e di problem solving, applicate a scenari reali e complessi.\r\n- Conoscenze di base di strumenti di gestione progetto.",
-    "Numero di tirocinanti:": "1",
-    "Durata:": "300 (Ore)",
-    "Data d'inizio prevista:": "02/11/2026",
-    "Data di fine prevista:": "05/03/2027",
-    "Nazione:": "ITALIA",
-    "Provincia:": "BOLOGNA",
-    "Comune:": "BOLOGNA",
-    "Indirizzo:": "Via guelfa 5",
-    "Sono previste indennità/rimborsi spese/borse di studio/premi:": "N",
-    "Data inizio pubblicazione:": "29/10/2026",
-    "Data di scadenza della pubblicazione:": "08/11/2026",
-    "Nome del tutor del soggetto ospitante:": "Mattia",
-    "Cognome del tutor del soggetto ospitante:": "Maimura",
-    "Ruolo del tutor del soggetto ospitante:": "CEO",
-    "Eventuali conoscenze linguistiche richieste:": "",
-    "Eventuali conoscenze informatiche richieste:": "",
-    "Note:": "",
-    "Corsi:": [
-      "BUSINESS AND ECONOMICS (Laurea Triennale)",
-      "INFORMATICA PER IL MANAGEMENT (Laurea Triennale)"
     ]
   }
 ]
